@@ -5,7 +5,7 @@ from mcp.types import Tool
 class ShiftReconciliationLinesController:
     def get_tools(self) -> List[Tool]:
         return [
-            Tool(name="shift_reconciliation_lines_get_shift_reconciliation_lines", description="Gets shift reconciliation lines.", inputSchema={"type":"object","properties":{"shiftReconciliationLineRetrievalCriteria":{"type":"object"},"baseUrl":{"type":"string","default":"https://your-commerce-site.com"}},"required":["shiftReconciliationLineRetrievalCriteria"]}),
+            Tool(name="shift_recon_get_lines", description="Gets shift reconciliation lines.", inputSchema={"type":"object","properties":{"shiftReconciliationLineRetrievalCriteria":{"type":"object"},"baseUrl":{"type":"string","default":"https://your-commerce-site.com"}},"required":["shiftReconciliationLineRetrievalCriteria"]}),
             Tool(name="shift_reconciliation_lines_reconcile_lines", description="Reconciles the lines.", inputSchema={"type":"object","properties":{"lines":{"type":"array"},"description":{"type":"string"},"baseUrl":{"type":"string","default":"https://your-commerce-site.com"}},"required":["lines"]}),
             Tool(name="shift_reconciliation_lines_undo_reconciliation", description="Undo reconciliation for groups in passed lines.", inputSchema={"type":"object","properties":{"lines":{"type":"array"},"baseUrl":{"type":"string","default":"https://your-commerce-site.com"}},"required":["lines"]})
         ]

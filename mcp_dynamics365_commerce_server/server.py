@@ -314,15 +314,15 @@ class Dynamics365CommerceServer:
                 result = await self.catalogs_controller.handle_tool(name, arguments)
             elif name.startswith("categories_"):
                 result = await self.categories_controller.handle_tool(name, arguments)
-            elif name.startswith("commission_sales_group_"):
+            elif name.startswith("commission_sales_"):
                 result = await self.commission_sales_group_controller.handle_tool(name, arguments)
             elif name.startswith("district_"):
                 result = await self.district_controller.handle_tool(name, arguments)
-            elif name.startswith("environment_configuration_"):
+            elif name.startswith("env_config_"):
                 result = await self.environment_configuration_controller.handle_tool(name, arguments)
-            elif name.startswith("extension_package_definition_"):
+            elif name.startswith("ext_pkg_def_"):
                 result = await self.extension_package_definition_controller.handle_tool(name, arguments)
-            elif name.startswith("extensible_enumeration_"):
+            elif name.startswith("extensible_enum_"):
                 result = await self.extensible_enumeration_controller.handle_tool(name, arguments)
             elif name.startswith("gift_card_"):
                 result = await self.gift_card_controller.handle_tool(name, arguments)
@@ -330,7 +330,7 @@ class Dynamics365CommerceServer:
                 result = await self.hardware_profiles_controller.handle_tool(name, arguments)
             elif name.startswith("image_"):
                 result = await self.image_controller.handle_tool(name, arguments)
-            elif name.startswith("income_expense_accounts_"):
+            elif name.startswith("income_expense_"):
                 result = await self.income_expense_accounts_controller.handle_tool(name, arguments)
             elif name.startswith("kits_"):
                 result = await self.kits_controller.handle_tool(name, arguments)
@@ -354,7 +354,7 @@ class Dynamics365CommerceServer:
                 result = await self.report_datasets_controller.handle_tool(name, arguments)
             elif name.startswith("search_"):
                 result = await self.search_controller.handle_tool(name, arguments)
-            elif name.startswith("shift_reconciliation_lines_"):
+            elif name.startswith("shift_recon_"):
                 result = await self.shift_reconciliation_lines_controller.handle_tool(name, arguments)
             elif name.startswith("state_province_"):
                 result = await self.state_province_controller.handle_tool(name, arguments)
@@ -362,7 +362,7 @@ class Dynamics365CommerceServer:
                 result = await self.store_safe_controller.handle_tool(name, arguments)
             elif name.startswith("tax_"):
                 result = await self.tax_controller.handle_tool(name, arguments)
-            elif name.startswith("tender_drop_and_declare_operation_"):
+            elif name.startswith("tender_drop_"):
                 result = await self.tender_drop_and_declare_operation_controller.handle_tool(name, arguments)
             elif name.startswith("transfer_order_"):
                 result = await self.transfer_order_controller.handle_tool(name, arguments)
@@ -374,13 +374,13 @@ class Dynamics365CommerceServer:
                 result = await self.zipcodes_controller.handle_tool(name, arguments)
             elif name.startswith("publishing_"):
                 result = await self.publishing_controller.handle_tool(name, arguments)
-            elif name.startswith("non_sales_transaction_tender_operations_"):
+            elif name.startswith("non_sales_tender_"):
                 result = await self.non_sales_transaction_tender_operations_controller.handle_tool(name, arguments)
-            elif name.startswith("sales_orders_fulfillment_"):
+            elif name.startswith("fulfillment_"):
                 result = await self.sales_orders_fulfillment_controller.handle_tool(name, arguments)
             elif name.startswith("scan_result_"):
                 result = await self.scan_result_controller.handle_tool(name, arguments)
-            elif name.startswith("stock_count_journal_"):
+            elif name.startswith("stock_count_"):
                 result = await self.stock_count_journal_controller.handle_tool(name, arguments)
             else:
                 result = {"error": f"Unknown tool: {name}"}

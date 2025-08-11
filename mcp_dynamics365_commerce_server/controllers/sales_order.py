@@ -97,7 +97,7 @@ class SalesOrderController:
             ),
             # 4. Search Sales Transactions by Receipt ID
             Tool(
-                name="salesorder_search_sales_transactions_by_receipt_id",
+                name="salesorder_search_transactions_by_receipt",
                 description="Search sales transactions by receipt identifier",
                 inputSchema={
                     "type": "object",
@@ -277,7 +277,7 @@ class SalesOrderController:
             ),
             # 15. Get Sales Order Details by Transaction ID
             Tool(
-                name="salesorder_get_sales_order_details_by_transaction_id",
+                name="salesorder_get_details_by_transaction_id",
                 description="Get sales order details by transaction ID",
                 inputSchema={
                     "type": "object",
@@ -304,7 +304,7 @@ class SalesOrderController:
             ),
             # 17. Get Sales Order Details by Quotation ID
             Tool(
-                name="salesorder_get_sales_order_details_by_quotation_id",
+                name="salesorder_get_details_by_quotation_id",
                 description="Get sales order details by quotation ID",
                 inputSchema={
                     "type": "object",
@@ -420,7 +420,7 @@ class SalesOrderController:
             ),
             # 23. Get Order by Channel Reference Lookup Criteria
             Tool(
-                name="salesorder_get_order_by_channel_reference_lookup_criteria",
+                name="salesorder_get_order_by_channel_ref",
                 description="Get sales order by channel reference ID",
                 inputSchema={
                     "type": "object",
@@ -440,7 +440,7 @@ class SalesOrderController:
             ),
             # 24. Search Sales Transactions by Receipt ID (Paged)
             Tool(
-                name="salesorder_search_sales_transactions_by_receipt_id_paged",
+                name="salesorder_search_transactions_by_receipt_paged",
                 description="Search sales transactions by receipt identifier with paging support",
                 inputSchema={
                     "type": "object",

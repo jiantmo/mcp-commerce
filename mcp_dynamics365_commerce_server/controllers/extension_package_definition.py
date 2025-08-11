@@ -5,7 +5,7 @@ from mcp.types import Tool
 class ExtensionPackageDefinitionController:
     def get_tools(self) -> List[Tool]:
         return [
-            Tool(name="extension_package_definition_get_extension_package_definitions", description="Gets configured extension package definitions.", inputSchema={"type":"object","properties":{"baseUrl":{"type":"string","default":"https://your-commerce-site.com"}},"required":[]})
+            Tool(name="ext_pkg_def_get_definitions", description="Gets configured extension package definitions.", inputSchema={"type":"object","properties":{"baseUrl":{"type":"string","default":"https://your-commerce-site.com"}},"required":[]})
         ]
 
     async def handle_tool(self, name: str, arguments: Dict[str, Any]) -> Dict[str, Any]:

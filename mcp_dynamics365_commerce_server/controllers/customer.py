@@ -308,7 +308,7 @@ class CustomerController:
                 }
             ),
             Tool(
-                name="customer_post_nontransactional_activity_loyalty_points",
+                name="customer_post_loyalty_points",
                 description="Post non-transactional activity loyalty points for a customer",
                 inputSchema={
                     "type": "object",

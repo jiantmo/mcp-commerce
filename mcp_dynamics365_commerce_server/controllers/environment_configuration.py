@@ -5,7 +5,7 @@ from mcp.types import Tool
 class EnvironmentConfigurationController:
     def get_tools(self) -> List[Tool]:
         return [
-            Tool(name="environment_configuration_get_environment_configuration", description="Gets environment configuration.", inputSchema={"type":"object","properties":{"baseUrl":{"type":"string","default":"https://your-commerce-site.com"}},"required":[]}),
+            Tool(name="env_config_get_configuration", description="Gets environment configuration.", inputSchema={"type":"object","properties":{"baseUrl":{"type":"string","default":"https://your-commerce-site.com"}},"required":[]}),
             Tool(name="environment_configuration_get_extension_profile", description="Gets extension profile.", inputSchema={"type":"object","properties":{"baseUrl":{"type":"string","default":"https://your-commerce-site.com"}},"required":[]})
         ]
 

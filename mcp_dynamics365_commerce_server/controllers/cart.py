@@ -47,7 +47,7 @@ Available MCP Tools (55 total):
 43. cart_add_coupons - Add coupons to cart
 44. cart_remove_coupons - Remove coupons from cart
 45. cart_get_charge_codes - Get charge codes
-46. cart_get_max_loyalty_points_to_redeem_for_transaction_balance - Get max loyalty points for redemption
+46. cart_get_max_loyalty_points_for_balance - Get max loyalty points for redemption
 47. cart_get_declined_or_voided_card_receipts - Get declined/voided card receipts
 48. cart_reset_all_charges - Reset all charges
 49. cart_get_entity_by_key - Get cart entity by key
@@ -216,7 +216,7 @@ class CartController:
             Tool(name="cart_get_charge_codes", description="Get charge codes",
                  inputSchema={"type": "object", "properties": {"baseUrl": {"type": "string", "default": "https://your-commerce-site.com"}}, "required": []}),
             
-            Tool(name="cart_get_max_loyalty_points_to_redeem_for_transaction_balance", description="Get max loyalty points for redemption",
+            Tool(name="cart_get_max_loyalty_points_for_balance", description="Get max loyalty points for redemption",
                  inputSchema={"type": "object", "properties": {"cartId": {"type": "string"}, "loyaltyCardNumber": {"type": "string"}, "redeemCurrency": {"type": "string"}, "baseUrl": {"type": "string", "default": "https://your-commerce-site.com"}}, "required": ["cartId", "loyaltyCardNumber", "redeemCurrency"]}),
             
             Tool(name="cart_get_declined_or_voided_card_receipts", description="Get declined/voided card receipts",

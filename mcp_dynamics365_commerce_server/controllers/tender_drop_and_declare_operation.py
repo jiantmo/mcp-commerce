@@ -5,7 +5,7 @@ from mcp.types import Tool
 class TenderDropAndDeclareOperationController:
     def get_tools(self) -> List[Tool]:
         return [
-            Tool(name="tender_drop_and_declare_operation_create_drop_and_declare_transaction", description="Performs saving tender drop and declare store operations.", inputSchema={"type":"object","properties":{"dropAndDeclareTransaction":{"type":"object"},"baseUrl":{"type":"string","default":"https://your-commerce-site.com"}},"required":["dropAndDeclareTransaction"]})
+            Tool(name="tender_drop_create_transaction", description="Performs saving tender drop and declare store operations.", inputSchema={"type":"object","properties":{"dropAndDeclareTransaction":{"type":"object"},"baseUrl":{"type":"string","default":"https://your-commerce-site.com"}},"required":["dropAndDeclareTransaction"]})
         ]
 
     async def handle_tool(self, name: str, arguments: Dict[str, Any]) -> Dict[str, Any]:

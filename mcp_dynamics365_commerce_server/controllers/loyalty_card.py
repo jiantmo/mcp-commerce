@@ -1,13 +1,21 @@
 """
 Loyalty Card Controller for Dynamics 365 Commerce MCP Server
 
-Available MCP Tools (3 total):
+Available MCP Tools (10 total):
 1. loyaltycard_issue_loyalty_card - Issue a new loyalty card to a customer
 2. loyaltycard_get_loyalty_card - Get loyalty card information and current status
 3. loyaltycard_get_loyalty_card_transactions - Get transaction history for a loyalty card
+4. loyaltycard_get_loyalty_card_balance - Get loyalty card points balance
+5. loyaltycard_earn_points - Add earned points to a loyalty card
+6. loyaltycard_redeem_points - Redeem points from a loyalty card
+7. loyaltycard_transfer_points - Transfer points between loyalty cards
+8. loyaltycard_get_loyalty_programs - Get available loyalty programs
+9. loyaltycard_update_loyalty_card - Update loyalty card information
+10. loyaltycard_block_loyalty_card - Block or unblock a loyalty card
 
 This controller handles all loyalty program operations including card issuance,
-loyalty account management, and points/transaction history tracking.
+loyalty account management, points/transaction history tracking, points transfers,
+and loyalty program management.
 """
 
 from typing import Any, Dict, List
@@ -128,6 +136,101 @@ class LoyaltyCardController:
                         }
                     },
                     "required": []
+                }
+            ),
+            Tool(
+                name="loyaltycard_get_loyalty_card_balance",
+                description="Get loyalty card points balance",
+                inputSchema={
+                    "type": "object",
+                    "properties": {
+                        "cardId": {"type": "string", "description": "Loyalty card ID"},
+                        "cardNumber": {"type": "string", "description": "Loyalty card number"},
+                        "baseUrl": {"type": "string", "default": "https://your-commerce-site.com"}
+                    },
+                    "required": []
+                }
+            ),
+            Tool(
+                name="loyaltycard_earn_points",
+                description="Add earned points to a loyalty card",
+                inputSchema={
+                    "type": "object",
+                    "properties": {
+                        "cardId": {"type": "string", "description": "Loyalty card ID"},
+                        "points": {"type": "number", "description": "Points to earn"},
+                        "transactionId": {"type": "string", "description": "Transaction ID"},
+                        "reason": {"type": "string", "description": "Reason for earning points"},
+                        "baseUrl": {"type": "string", "default": "https://your-commerce-site.com"}
+                    },
+                    "required": ["cardId", "points"]
+                }
+            ),
+            Tool(
+                name="loyaltycard_redeem_points",
+                description="Redeem points from a loyalty card",
+                inputSchema={
+                    "type": "object",
+                    "properties": {
+                        "cardId": {"type": "string", "description": "Loyalty card ID"},
+                        "points": {"type": "number", "description": "Points to redeem"},
+                        "redemptionType": {"type": "string", "description": "Type of redemption"},
+                        "baseUrl": {"type": "string", "default": "https://your-commerce-site.com"}
+                    },
+                    "required": ["cardId", "points"]
+                }
+            ),
+            Tool(
+                name="loyaltycard_transfer_points",
+                description="Transfer points between loyalty cards",
+                inputSchema={
+                    "type": "object",
+                    "properties": {
+                        "fromCardId": {"type": "string", "description": "Source card ID"},
+                        "toCardId": {"type": "string", "description": "Destination card ID"},
+                        "points": {"type": "number", "description": "Points to transfer"},
+                        "reason": {"type": "string", "description": "Transfer reason"},
+                        "baseUrl": {"type": "string", "default": "https://your-commerce-site.com"}
+                    },
+                    "required": ["fromCardId", "toCardId", "points"]
+                }
+            ),
+            Tool(
+                name="loyaltycard_get_loyalty_programs",
+                description="Get available loyalty programs",
+                inputSchema={
+                    "type": "object",
+                    "properties": {
+                        "includeInactive": {"type": "boolean", "default": False},
+                        "baseUrl": {"type": "string", "default": "https://your-commerce-site.com"}
+                    }
+                }
+            ),
+            Tool(
+                name="loyaltycard_update_loyalty_card",
+                description="Update loyalty card information",
+                inputSchema={
+                    "type": "object",
+                    "properties": {
+                        "cardId": {"type": "string", "description": "Loyalty card ID"},
+                        "updateData": {"type": "object", "description": "Update data"},
+                        "baseUrl": {"type": "string", "default": "https://your-commerce-site.com"}
+                    },
+                    "required": ["cardId", "updateData"]
+                }
+            ),
+            Tool(
+                name="loyaltycard_block_loyalty_card",
+                description="Block or unblock a loyalty card",
+                inputSchema={
+                    "type": "object",
+                    "properties": {
+                        "cardId": {"type": "string", "description": "Loyalty card ID"},
+                        "isBlocked": {"type": "boolean", "description": "Block status"},
+                        "reason": {"type": "string", "description": "Block/unblock reason"},
+                        "baseUrl": {"type": "string", "default": "https://your-commerce-site.com"}
+                    },
+                    "required": ["cardId", "isBlocked"]
                 }
             )
         ]
@@ -362,6 +465,152 @@ class LoyaltyCardController:
                     "totalPages": 1,
                     "hasMore": False
                 }
+            }
+        elif name == "loyaltycard_get_loyalty_card_balance":
+            card_id = arguments.get("cardId", "LC001")
+            card_number = arguments.get("cardNumber")
+            
+            return {
+                "api": f"GET {base_url}/api/CommerceRuntime/LoyaltyCards/{card_id or 'lookup'}/Balance",
+                "loyaltyCardId": card_id or "LC001",
+                "cardNumber": card_number or "1234-5678-9012-3456",
+                "balance": {
+                    "available": 2450,
+                    "pending": 125,
+                    "expired": 0,
+                    "totalLifetime": 5780
+                },
+                "lastUpdated": datetime.now().isoformat() + "Z"
+            }
+        
+        elif name == "loyaltycard_earn_points":
+            card_id = arguments.get("cardId", "LC001")
+            points = arguments.get("points", 100)
+            transaction_id = arguments.get("transactionId", f"TXN{random.randint(100000, 999999)}")
+            reason = arguments.get("reason", "Purchase reward")
+            
+            return {
+                "api": f"POST {base_url}/api/CommerceRuntime/LoyaltyCards/{card_id}/EarnPoints",
+                "transactionId": transaction_id,
+                "loyaltyCardId": card_id,
+                "pointsEarned": points,
+                "reason": reason,
+                "earnedAt": datetime.now().isoformat() + "Z",
+                "newBalance": 2450 + points,
+                "status": "completed"
+            }
+        
+        elif name == "loyaltycard_redeem_points":
+            card_id = arguments.get("cardId", "LC001")
+            points = arguments.get("points", 500)
+            redemption_type = arguments.get("redemptionType", "discount")
+            
+            return {
+                "api": f"POST {base_url}/api/CommerceRuntime/LoyaltyCards/{card_id}/RedeemPoints",
+                "transactionId": f"RED{random.randint(100000, 999999)}",
+                "loyaltyCardId": card_id,
+                "pointsRedeemed": points,
+                "redemptionType": redemption_type,
+                "redemptionValue": points * 0.05,  # 5 cents per point
+                "redeemedAt": datetime.now().isoformat() + "Z",
+                "newBalance": max(0, 2450 - points),
+                "status": "completed"
+            }
+        
+        elif name == "loyaltycard_transfer_points":
+            from_card_id = arguments.get("fromCardId")
+            to_card_id = arguments.get("toCardId")
+            points = arguments.get("points", 100)
+            reason = arguments.get("reason", "Point transfer")
+            
+            return {
+                "api": f"POST {base_url}/api/CommerceRuntime/LoyaltyCards/TransferPoints",
+                "transferId": f"TRF{random.randint(100000, 999999)}",
+                "fromCardId": from_card_id,
+                "toCardId": to_card_id,
+                "pointsTransferred": points,
+                "reason": reason,
+                "transferredAt": datetime.now().isoformat() + "Z",
+                "fromCardNewBalance": max(0, 2450 - points),
+                "toCardNewBalance": 1800 + points,
+                "status": "completed"
+            }
+        
+        elif name == "loyaltycard_get_loyalty_programs":
+            include_inactive = arguments.get("includeInactive", False)
+            
+            programs = [
+                {
+                    "programId": "PROG001",
+                    "programName": "Rewards Plus",
+                    "description": "Earn points on every purchase",
+                    "status": "Active",
+                    "earnRate": 1.0,
+                    "minimumAge": 13,
+                    "joinDate": "2023-01-01T00:00:00Z",
+                    "tiers": [
+                        {"tierId": "TIER001", "tierName": "Bronze", "minimumPoints": 0},
+                        {"tierId": "TIER002", "tierName": "Silver", "minimumPoints": 1000},
+                        {"tierId": "TIER003", "tierName": "Gold", "minimumPoints": 5000}
+                    ]
+                },
+                {
+                    "programId": "PROG002",
+                    "programName": "VIP Elite",
+                    "description": "Premium membership with exclusive benefits",
+                    "status": "Active",
+                    "earnRate": 2.0,
+                    "minimumAge": 18,
+                    "joinDate": "2023-01-01T00:00:00Z",
+                    "membershipFee": 99.99,
+                    "tiers": [
+                        {"tierId": "TIER004", "tierName": "VIP", "minimumPoints": 0},
+                        {"tierId": "TIER005", "tierName": "VIP Elite", "minimumPoints": 10000}
+                    ]
+                }
+            ]
+            
+            if include_inactive:
+                programs.append({
+                    "programId": "PROG003",
+                    "programName": "Legacy Rewards",
+                    "description": "Discontinued program",
+                    "status": "Inactive",
+                    "endDate": "2023-12-31T23:59:59Z"
+                })
+            
+            return {
+                "api": f"GET {base_url}/api/CommerceRuntime/LoyaltyPrograms",
+                "programs": programs,
+                "totalCount": len(programs)
+            }
+        
+        elif name == "loyaltycard_update_loyalty_card":
+            card_id = arguments.get("cardId")
+            update_data = arguments.get("updateData", {})
+            
+            return {
+                "api": f"PATCH {base_url}/api/CommerceRuntime/LoyaltyCards/{card_id}",
+                "loyaltyCardId": card_id,
+                "updatedFields": list(update_data.keys()),
+                "updatedAt": datetime.now().isoformat() + "Z",
+                "success": True,
+                "changes": update_data
+            }
+        
+        elif name == "loyaltycard_block_loyalty_card":
+            card_id = arguments.get("cardId")
+            is_blocked = arguments.get("isBlocked", True)
+            reason = arguments.get("reason", "Security concern")
+            
+            return {
+                "api": f"POST {base_url}/api/CommerceRuntime/LoyaltyCards/{card_id}/Block",
+                "loyaltyCardId": card_id,
+                "isBlocked": is_blocked,
+                "reason": reason,
+                "actionPerformedAt": datetime.now().isoformat() + "Z",
+                "newStatus": "Blocked" if is_blocked else "Active",
+                "success": True
             }
         
         else:
