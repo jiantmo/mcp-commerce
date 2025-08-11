@@ -1,8 +1,9 @@
 """
 Device Configuration Controller for Dynamics 365 Commerce MCP Server
 
-Available MCP Tools (1 total):
+Available MCP Tools (2 total):
 1. device_configuration_get_device_configuration - Gets a single device configuration
+2. device_configuration_update_device_configuration - Update device configuration settings
 
 This controller handles device configuration operations for POS and terminal settings.
 """
@@ -35,6 +36,19 @@ class DeviceConfigurationController:
                         }
                     },
                     "required": []
+                }
+            ),
+            Tool(
+                name="device_configuration_update_device_configuration",
+                description="Update device configuration settings",
+                inputSchema={
+                    "type": "object",
+                    "properties": {
+                        "deviceId": {"type": "string"},
+                        "configuration": {"type": "object"},
+                        "baseUrl": {"type": "string", "default": "https://your-commerce-site.com"}
+                    },
+                    "required": ["deviceId", "configuration"]
                 }
             )
         ]
@@ -204,5 +218,16 @@ class DeviceConfigurationController:
                 "status": "success"
             }
         
+        elif name == "device_configuration_update_device_configuration":
+            device_id = arguments.get("deviceId")
+            config = arguments.get("configuration", {})
+            
+            return {
+                "api": f"PUT {base_url}/api/CommerceRuntime/DeviceConfiguration/{device_id}",
+                "deviceId": device_id,
+                "updated": True,
+                "configuration": config,
+                "timestamp": datetime.now().isoformat() + "Z"
+            }
         else:
             return {"error": f"Unknown device configuration tool: {name}"}

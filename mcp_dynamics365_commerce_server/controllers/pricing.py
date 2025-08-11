@@ -1,8 +1,9 @@
 """
 Pricing Controller for Dynamics 365 Commerce MCP Server
 
-Available MCP Tools (1 total):
+Available MCP Tools (2 total):
 1. pricing_calculate_sales_document - Calculates prices and discounts for products at given quantities if they are bought together in an order
+2. pricing_get_price_groups - Get price groups for customer segments
 
 This controller handles pricing calculations and discount applications.
 """
@@ -52,6 +53,17 @@ class PricingController:
                         }
                     },
                     "required": ["salesDocument"]
+                }
+            ),
+            Tool(
+                name="pricing_get_price_groups",
+                description="Get price groups for customer segments",
+                inputSchema={
+                    "type": "object",
+                    "properties": {
+                        "customerId": {"type": "string"},
+                        "baseUrl": {"type": "string", "default": "https://your-commerce-site.com"}
+                    }
                 }
             )
         ]
@@ -209,5 +221,14 @@ class PricingController:
                 "status": "success"
             }
         
+        elif name == "pricing_get_price_groups":
+            return {
+                "api": f"GET {base_url}/api/CommerceRuntime/Pricing/PriceGroups",
+                "priceGroups": [
+                    {"id": "RETAIL", "name": "Retail", "discount": 0.0},
+                    {"id": "VIP", "name": "VIP", "discount": 0.15},
+                    {"id": "WHOLESALE", "name": "Wholesale", "discount": 0.25}
+                ]
+            }
         else:
             return {"error": f"Unknown pricing tool: {name}"}

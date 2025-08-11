@@ -1,8 +1,9 @@
 """
 Delivery Options Controller for Dynamics 365 Commerce MCP Server
 
-Available MCP Tools (1 total):
+Available MCP Tools (2 total):
 1. delivery_options_get_delivery_options - Get the delivery options for the channel
+2. delivery_options_calculate_shipping_cost - Calculate shipping cost for delivery
 
 This controller handles delivery option operations for shipping and fulfillment.
 """
@@ -74,6 +75,20 @@ class DeliveryOptionsController:
                         }
                     },
                     "required": ["id", "shippingAddress"]
+                }
+            ),
+            Tool(
+                name="delivery_options_calculate_shipping_cost",
+                description="Calculate shipping cost for delivery",
+                inputSchema={
+                    "type": "object",
+                    "properties": {
+                        "address": {"type": "object"},
+                        "items": {"type": "array"},
+                        "deliveryMethod": {"type": "string"},
+                        "baseUrl": {"type": "string", "default": "https://your-commerce-site.com"}
+                    },
+                    "required": ["address", "items"]
                 }
             )
         ]
@@ -279,5 +294,12 @@ class DeliveryOptionsController:
                 "status": "success"
             }
         
+        elif name == "delivery_options_calculate_shipping_cost":
+            return {
+                "api": f"POST {base_url}/api/CommerceRuntime/DeliveryOptions/CalculateShippingCost",
+                "shippingCost": round(random.uniform(5.99, 25.99), 2),
+                "deliveryTime": "3-5 business days",
+                "carrier": "Standard Shipping"
+            }
         else:
             return {"error": f"Unknown delivery options tool: {name}"}

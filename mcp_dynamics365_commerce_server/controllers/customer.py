@@ -22,9 +22,14 @@ from datetime import datetime, timedelta
 import random
 import string
 from mcp.types import Tool
+from ..database import get_database
+from ..config import get_base_url
 
 class CustomerController:
     """Controller for Customer-related Dynamics 365 Commerce API operations"""
+    
+    def __init__(self):
+        self.db = get_database()
     
     def get_tools(self) -> List[Tool]:
         """Return list of customer-related tools"""
@@ -41,8 +46,7 @@ class CustomerController:
                         },
                         "baseUrl": {
                             "type": "string",
-                            "description": "Base URL of the Dynamics 365 Commerce site",
-                            "default": "https://your-commerce-site.com"
+                            "description": "Base URL of the Dynamics 365 Commerce site (uses DYNAMICS365_BASE_URL env var if not provided)"
                         }
                     },
                     "required": ["customerId"]
@@ -54,9 +58,13 @@ class CustomerController:
                 inputSchema={
                     "type": "object",
                     "properties": {
-                        "name": {
+                        "first_name": {
                             "type": "string",
-                            "description": "Customer name"
+                            "description": "Customer first name"
+                        },
+                        "last_name": {
+                            "type": "string",
+                            "description": "Customer last name"
                         },
                         "email": {
                             "type": "string",
@@ -66,24 +74,17 @@ class CustomerController:
                             "type": "string",
                             "description": "Customer phone number"
                         },
-                        "address": {
-                            "type": "object",
-                            "description": "Customer address",
-                            "properties": {
-                                "street": {"type": "string"},
-                                "city": {"type": "string"},
-                                "state": {"type": "string"},
-                                "zipCode": {"type": "string"},
-                                "country": {"type": "string"}
-                            }
+                        "customer_group": {
+                            "type": "string",
+                            "description": "Customer group (REGULAR, VIP, etc.)",
+                            "default": "REGULAR"
                         },
                         "baseUrl": {
                             "type": "string",
-                            "description": "Base URL of the Dynamics 365 Commerce site",
-                            "default": "https://your-commerce-site.com"
+                            "description": "Base URL of the Dynamics 365 Commerce site (uses DYNAMICS365_BASE_URL env var if not provided)"
                         }
                     },
-                    "required": ["name", "email"]
+                    "required": ["first_name", "last_name", "email"]
                 }
             ),
             Tool(
@@ -96,33 +97,29 @@ class CustomerController:
                             "type": "string",
                             "description": "The customer ID to update"
                         },
-                        "name": {
+                        "first_name": {
                             "type": "string",
-                            "description": "Updated customer name"
+                            "description": "Customer first name"
+                        },
+                        "last_name": {
+                            "type": "string",
+                            "description": "Customer last name"
                         },
                         "email": {
                             "type": "string",
-                            "description": "Updated customer email address"
+                            "description": "Customer email address"
                         },
                         "phone": {
                             "type": "string",
-                            "description": "Updated customer phone number"
+                            "description": "Customer phone number"
                         },
-                        "address": {
-                            "type": "object",
-                            "description": "Updated customer address",
-                            "properties": {
-                                "street": {"type": "string"},
-                                "city": {"type": "string"},
-                                "state": {"type": "string"},
-                                "zipCode": {"type": "string"},
-                                "country": {"type": "string"}
-                            }
+                        "customer_group": {
+                            "type": "string",
+                            "description": "Customer group"
                         },
                         "baseUrl": {
                             "type": "string",
-                            "description": "Base URL of the Dynamics 365 Commerce site",
-                            "default": "https://your-commerce-site.com"
+                            "description": "Base URL of the Dynamics 365 Commerce site (uses DYNAMICS365_BASE_URL env var if not provided)"
                         }
                     },
                     "required": ["customerId"]
@@ -138,23 +135,14 @@ class CustomerController:
                             "type": "string",
                             "description": "The customer ID to get order history for"
                         },
-                        "startDate": {
-                            "type": "string",
-                            "description": "Start date for order history (ISO format)"
-                        },
-                        "endDate": {
-                            "type": "string",
-                            "description": "End date for order history (ISO format)"
-                        },
                         "limit": {
-                            "type": "number",
-                            "description": "Maximum number of orders to return",
-                            "default": 50
+                            "type": "integer",
+                            "description": "Number of orders to return",
+                            "default": 10
                         },
                         "baseUrl": {
                             "type": "string",
-                            "description": "Base URL of the Dynamics 365 Commerce site",
-                            "default": "https://your-commerce-site.com"
+                            "description": "Base URL of the Dynamics 365 Commerce site (uses DYNAMICS365_BASE_URL env var if not provided)"
                         }
                     },
                     "required": ["customerId"]
@@ -170,21 +158,14 @@ class CustomerController:
                             "type": "string",
                             "description": "Search query (name, email, phone, etc.)"
                         },
-                        "searchBy": {
-                            "type": "string",
-                            "enum": ["name", "email", "phone", "customerId"],
-                            "description": "Field to search by",
-                            "default": "name"
-                        },
                         "limit": {
-                            "type": "number",
+                            "type": "integer",
                             "description": "Maximum number of results to return",
-                            "default": 25
+                            "default": 20
                         },
                         "baseUrl": {
                             "type": "string",
-                            "description": "Base URL of the Dynamics 365 Commerce site",
-                            "default": "https://your-commerce-site.com"
+                            "description": "Base URL of the Dynamics 365 Commerce site (uses DYNAMICS365_BASE_URL env var if not provided)"
                         }
                     },
                     "required": ["query"]
@@ -200,27 +181,14 @@ class CustomerController:
                             "type": "string",
                             "description": "The customer ID to get purchase history for"
                         },
-                        "startDate": {
-                            "type": "string",
-                            "description": "Start date for purchase history (ISO format)"
-                        },
-                        "endDate": {
-                            "type": "string",
-                            "description": "End date for purchase history (ISO format)"
-                        },
-                        "categoryId": {
-                            "type": "string",
-                            "description": "Filter by product category ID"
-                        },
                         "limit": {
-                            "type": "number",
-                            "description": "Maximum number of purchases to return",
-                            "default": 50
+                            "type": "integer",
+                            "description": "Number of purchases to return",
+                            "default": 20
                         },
                         "baseUrl": {
                             "type": "string",
-                            "description": "Base URL of the Dynamics 365 Commerce site",
-                            "default": "https://your-commerce-site.com"
+                            "description": "Base URL of the Dynamics 365 Commerce site (uses DYNAMICS365_BASE_URL env var if not provided)"
                         }
                     },
                     "required": ["customerId"]
@@ -228,28 +196,18 @@ class CustomerController:
             ),
             Tool(
                 name="customer_get_by_account_numbers",
-                description="Get customers list from the list of customer account numbers",
+                description="Get customers list from account numbers",
                 inputSchema={
                     "type": "object",
                     "properties": {
                         "accountNumbers": {
                             "type": "array",
                             "items": {"type": "string"},
-                            "description": "List of customer account numbers"
-                        },
-                        "searchLocationValue": {
-                            "type": "string",
-                            "description": "Search location value"
-                        },
-                        "limit": {
-                            "type": "number",
-                            "description": "Maximum number of customers to return",
-                            "default": 50
+                            "description": "List of account numbers to lookup"
                         },
                         "baseUrl": {
                             "type": "string",
-                            "description": "Base URL of the Dynamics 365 Commerce site",
-                            "default": "https://your-commerce-site.com"
+                            "description": "Base URL of the Dynamics 365 Commerce site (uses DYNAMICS365_BASE_URL env var if not provided)"
                         }
                     },
                     "required": ["accountNumbers"]
@@ -257,7 +215,7 @@ class CustomerController:
             ),
             Tool(
                 name="customer_get_customer_search_fields",
-                description="Get the customer search fields for the store set in headquarters",
+                description="Get customer search fields for the store",
                 inputSchema={
                     "type": "object",
                     "properties": {
@@ -267,11 +225,10 @@ class CustomerController:
                         },
                         "baseUrl": {
                             "type": "string",
-                            "description": "Base URL of the Dynamics 365 Commerce site",
-                            "default": "https://your-commerce-site.com"
+                            "description": "Base URL of the Dynamics 365 Commerce site (uses DYNAMICS365_BASE_URL env var if not provided)"
                         }
                     },
-                    "required": []
+                    "required": ["storeId"]
                 }
             ),
             Tool(
@@ -282,33 +239,24 @@ class CustomerController:
                     "properties": {
                         "searchFields": {
                             "type": "object",
-                            "description": "Customer fields to search by",
-                            "properties": {
-                                "firstName": {"type": "string"},
-                                "lastName": {"type": "string"},
-                                "email": {"type": "string"},
-                                "phone": {"type": "string"},
-                                "city": {"type": "string"},
-                                "zipCode": {"type": "string"},
-                                "loyaltyCardNumber": {"type": "string"}
-                            }
+                            "description": "Search criteria with field names and values",
+                            "additionalProperties": {"type": "string"}
                         },
                         "limit": {
-                            "type": "number",
+                            "type": "integer",
                             "description": "Maximum number of results to return",
                             "default": 25
                         },
                         "baseUrl": {
                             "type": "string",
-                            "description": "Base URL of the Dynamics 365 Commerce site",
-                            "default": "https://your-commerce-site.com"
+                            "description": "Base URL of the Dynamics 365 Commerce site (uses DYNAMICS365_BASE_URL env var if not provided)"
                         }
                     },
                     "required": ["searchFields"]
                 }
             ),
             Tool(
-                name="customer_post_loyalty_points",
+                name="customer_post_nontransactional_activity_loyalty_points",
                 description="Post non-transactional activity loyalty points for a customer",
                 inputSchema={
                     "type": "object",
@@ -336,8 +284,7 @@ class CustomerController:
                         },
                         "baseUrl": {
                             "type": "string",
-                            "description": "Base URL of the Dynamics 365 Commerce site",
-                            "default": "https://your-commerce-site.com"
+                            "description": "Base URL of the Dynamics 365 Commerce site (uses DYNAMICS365_BASE_URL env var if not provided)"
                         }
                     },
                     "required": ["loyaltyCardNumber", "activityType", "points"]
@@ -346,381 +293,247 @@ class CustomerController:
         ]
     
     async def handle_tool(self, name: str, arguments: Dict[str, Any]) -> Dict[str, Any]:
-        """Handle customer tool calls with mock implementations"""
-        base_url = arguments.get("baseUrl", "https://your-commerce-site.com")
+        """Handle customer tool calls with database operations"""
+        base_url = arguments.get("baseUrl", get_base_url())
         
-        if name == "customer_get_order_shipments_history":
-            customer_id = arguments.get("customerId", "CUST001")
-            return {
-                "api": f"GET {base_url}/api/CommerceRuntime/Customers/{customer_id}/OrderShipmentsHistory",
-                "customerId": customer_id,
-                "shipments": [
-                    {
-                        "shipmentId": "SHIP001",
-                        "orderId": "ORDER001",
-                        "trackingNumber": "TRACK123456",
-                        "status": "Delivered",
-                        "deliveryDate": "2024-01-15T10:30:00Z",
-                        "carrier": "FedEx",
-                        "items": [
-                            {"productId": "PROD001", "productName": "Sample Product", "quantity": 2}
-                        ]
-                    },
-                    {
-                        "shipmentId": "SHIP002",
-                        "orderId": "ORDER002",
-                        "trackingNumber": "TRACK789012",
-                        "status": "In Transit",
-                        "estimatedDelivery": "2024-01-20T15:00:00Z",
-                        "carrier": "UPS"
-                    }
-                ]
-            }
-        
-        elif name == "customer_create_entity":
-            customer_id = f"CUST_{''.join(random.choices(string.ascii_uppercase + string.digits, k=9))}"
-            return {
-                "api": f"POST {base_url}/api/CommerceRuntime/Customers",
-                "customerId": customer_id,
-                "name": arguments.get("name", "John Doe"),
-                "email": arguments.get("email", "john.doe@example.com"),
-                "phone": arguments.get("phone"),
-                "address": arguments.get("address"),
-                "status": "Active",
-                "created": datetime.now().isoformat() + "Z",
-                "loyaltyCardNumber": f"LC{random.randint(100000, 999999)}"
-            }
-        
-        elif name == "customer_update_entity":
-            customer_id = arguments.get("customerId", "CUST001")
-            return {
-                "api": f"PUT {base_url}/api/CommerceRuntime/Customers/{customer_id}",
-                "customerId": customer_id,
-                "updated": True,
-                "lastModified": datetime.now().isoformat() + "Z",
-                "updatedFields": {
-                    "name": arguments.get("name"),
+        try:
+            if name == "customer_get_order_shipments_history":
+                customer_id = arguments.get("customerId")
+                customer = self.db.read('customers', customer_id)
+                if not customer:
+                    return {"error": f"Customer {customer_id} not found"}
+                
+                # Get orders for this customer and their shipments
+                orders = self.db.get_customer_orders(customer_id)
+                shipments = []
+                
+                for order in orders:
+                    if order.get('status') == 'Fulfilled':
+                        shipments.append({
+                            "shipmentId": f"SHIP_{order['id'][-3:]}",
+                            "orderId": order['id'],
+                            "orderNumber": order.get('order_number', order['id']),
+                            "trackingNumber": f"TRACK{random.randint(100000, 999999)}",
+                            "status": "Delivered",
+                            "deliveryDate": (datetime.now() - timedelta(days=random.randint(1, 30))).isoformat() + "Z",
+                            "carrier": random.choice(["FedEx", "UPS", "DHL", "USPS"]),
+                            "items": [
+                                {
+                                    "productId": line.get('product_id'),
+                                    "quantity": line.get('quantity', 1)
+                                } for line in order.get('lines', [])
+                            ]
+                        })
+                
+                return {
+                    "api": f"GET {base_url}/api/CommerceRuntime/Customers/{customer_id}/OrderShipmentsHistory",
+                    "customerId": customer_id,
+                    "customerName": f"{customer.get('first_name', '')} {customer.get('last_name', '')}",
+                    "shipments": shipments,
+                    "totalShipments": len(shipments)
+                }
+            
+            elif name == "customer_create_entity":
+                # Create new customer
+                customer_data = {
+                    "first_name": arguments.get("first_name"),
+                    "last_name": arguments.get("last_name"),
                     "email": arguments.get("email"),
                     "phone": arguments.get("phone"),
-                    "address": arguments.get("address")
+                    "customer_group": arguments.get("customer_group", "REGULAR"),
+                    "account_number": f"ACC{random.randint(100000, 999999)}",
+                    "loyalty_card_number": f"LOY{random.randint(100000, 999999)}",
+                    "addresses": []
                 }
-            }
-        
-        elif name == "customer_get_order_history":
-            customer_id = arguments.get("customerId", "CUST001")
-            limit = arguments.get("limit", 50)
-            return {
-                "api": f"GET {base_url}/api/CommerceRuntime/Customers/{customer_id}/OrderHistory",
-                "customerId": customer_id,
-                "totalOrders": 15,
-                "orders": [
-                    {
-                        "orderId": "ORDER001",
-                        "orderDate": "2024-01-10T14:30:00Z",
-                        "total": 125.99,
-                        "currency": "USD",
-                        "status": "Completed",
-                        "itemCount": 3,
-                        "shippingAddress": {
-                            "street": "123 Main St",
-                            "city": "Seattle",
-                            "state": "WA",
-                            "zipCode": "98101"
-                        }
-                    },
-                    {
-                        "orderId": "ORDER002",
-                        "orderDate": "2024-01-05T09:15:00Z",
-                        "total": 89.50,
-                        "currency": "USD",
-                        "status": "Delivered",
-                        "itemCount": 2,
-                        "deliveryDate": "2024-01-08T16:20:00Z"
-                    }
-                ][:limit]
-            }
-        
-        elif name == "customer_search":
-            query = arguments.get("query", "")
-            search_by = arguments.get("searchBy", "name")
-            limit = arguments.get("limit", 25)
-            return {
-                "api": f"GET {base_url}/api/CommerceRuntime/Customers/Search",
-                "query": query,
-                "searchBy": search_by,
-                "totalResults": 3,
-                "results": [
-                    {
-                        "customerId": "CUST001",
-                        "name": "John Doe",
-                        "email": "john.doe@example.com",
-                        "phone": "+1-555-0123",
-                        "status": "Active",
-                        "lastPurchaseDate": "2024-01-10T14:30:00Z",
-                        "totalSpent": 1250.75
-                    },
-                    {
-                        "customerId": "CUST002",
-                        "name": "Jane Smith",
-                        "email": "jane.smith@example.com",
-                        "phone": "+1-555-0124",
-                        "status": "Active",
-                        "lastPurchaseDate": "2024-01-08T11:20:00Z",
-                        "totalSpent": 890.25
-                    }
-                ][:limit]
-            }
-        
-        elif name == "customer_get_purchase_history":
-            customer_id = arguments.get("customerId", "CUST001")
-            limit = arguments.get("limit", 50)
-            return {
-                "api": f"GET {base_url}/api/CommerceRuntime/Customers/{customer_id}/PurchaseHistory",
-                "customerId": customer_id,
-                "totalPurchases": 8,
-                "purchases": [
-                    {
-                        "transactionId": "TXN001",
-                        "date": "2024-01-10T14:30:00Z",
-                        "storeId": "STORE001",
-                        "storeName": "Main Store",
-                        "items": [
-                            {
-                                "productId": "PROD001",
-                                "productName": "Wireless Headphones",
-                                "category": "Electronics",
-                                "quantity": 1,
-                                "unitPrice": 99.99,
-                                "total": 99.99
-                            },
-                            {
-                                "productId": "PROD002",
-                                "productName": "Phone Case",
-                                "category": "Accessories",
-                                "quantity": 2,
-                                "unitPrice": 13.00,
-                                "total": 26.00
-                            }
-                        ],
-                        "subtotal": 125.99,
-                        "tax": 10.08,
-                        "total": 136.07
-                    }
-                ][:limit]
-            }
-        
-        elif name == "customer_get_by_account_numbers":
-            account_numbers = arguments.get("accountNumbers", ["CUST001", "CUST002"])
-            search_location_value = arguments.get("searchLocationValue", "")
-            limit = arguments.get("limit", 50)
-            return {
-                "api": f"GET {base_url}/api/CommerceRuntime/Customers/GetByAccountNumbers",
-                "accountNumbers": account_numbers,
-                "searchLocationValue": search_location_value,
-                "totalCustomers": len(account_numbers),
-                "customers": [
-                    {
-                        "accountNumber": account_num,
-                        "customerId": account_num,
-                        "name": f"Customer {account_num[-3:]}",
-                        "email": f"customer{account_num[-3:]}@example.com",
-                        "phone": f"+1-555-0{random.randint(100, 199)}",
-                        "status": "Active",
-                        "createdDate": "2023-06-15T00:00:00Z",
-                        "lastUpdated": datetime.now().isoformat() + "Z",
-                        "address": {
-                            "street": f"{random.randint(100, 999)} Main St",
-                            "city": "Seattle",
-                            "state": "WA",
-                            "zipCode": f"981{random.randint(10, 99)}",
-                            "country": "USA"
-                        },
-                        "loyaltyCardNumber": f"LC{random.randint(100000, 999999)}"
-                    }
-                    for account_num in account_numbers
-                ][:limit]
-            }
-        
-        elif name == "customer_get_customer_search_fields":
-            store_id = arguments.get("storeId", "STORE001")
-            return {
-                "api": f"GET {base_url}/api/CommerceRuntime/Customers/GetCustomerSearchFields",
-                "storeId": store_id,
-                "searchFields": [
-                    {
-                        "fieldName": "firstName",
-                        "displayName": "First Name",
-                        "fieldType": "string",
-                        "isRequired": False,
-                        "maxLength": 50,
-                        "isSearchable": True,
-                        "orderIndex": 1
-                    },
-                    {
-                        "fieldName": "lastName", 
-                        "displayName": "Last Name",
-                        "fieldType": "string",
-                        "isRequired": False,
-                        "maxLength": 50,
-                        "isSearchable": True,
-                        "orderIndex": 2
-                    },
-                    {
-                        "fieldName": "email",
-                        "displayName": "Email Address",
-                        "fieldType": "email",
-                        "isRequired": False,
-                        "maxLength": 100,
-                        "isSearchable": True,
-                        "orderIndex": 3
-                    },
-                    {
-                        "fieldName": "phone",
-                        "displayName": "Phone Number",
-                        "fieldType": "phone",
-                        "isRequired": False,
-                        "maxLength": 20,
-                        "isSearchable": True,
-                        "orderIndex": 4
-                    },
-                    {
-                        "fieldName": "city",
-                        "displayName": "City",
-                        "fieldType": "string",
-                        "isRequired": False,
-                        "maxLength": 50,
-                        "isSearchable": True,
-                        "orderIndex": 5
-                    },
-                    {
-                        "fieldName": "zipCode",
-                        "displayName": "ZIP Code",
-                        "fieldType": "string",
-                        "isRequired": False,
-                        "maxLength": 10,
-                        "isSearchable": True,
-                        "orderIndex": 6
-                    },
-                    {
-                        "fieldName": "loyaltyCardNumber",
-                        "displayName": "Loyalty Card Number",
-                        "fieldType": "string",
-                        "isRequired": False,
-                        "maxLength": 20,
-                        "isSearchable": True,
-                        "orderIndex": 7
-                    }
-                ],
-                "totalFields": 7,
-                "storeConfiguration": {
-                    "enableAdvancedSearch": True,
-                    "defaultSearchField": "lastName",
-                    "maxSearchResults": 100
+                
+                customer_id = self.db.create('customers', customer_data)
+                created_customer = self.db.read('customers', customer_id)
+                
+                return {
+                    "api": f"POST {base_url}/api/CommerceRuntime/Customers",
+                    "success": True,
+                    "customer": created_customer
                 }
-            }
-        
-        elif name == "customer_search_by_fields":
-            search_fields = arguments.get("searchFields", {})
-            limit = arguments.get("limit", 25)
-            return {
-                "api": f"GET {base_url}/api/CommerceRuntime/Customers/SearchByFields",
-                "searchCriteria": search_fields,
-                "totalResults": 5,
-                "results": [
-                    {
-                        "customerId": "CUST001",
-                        "accountNumber": "CUST001",
-                        "firstName": search_fields.get("firstName", "John"),
-                        "lastName": search_fields.get("lastName", "Doe"),
-                        "email": search_fields.get("email", "john.doe@example.com"),
-                        "phone": search_fields.get("phone", "+1-555-0123"),
-                        "address": {
-                            "street": "123 Main Street",
-                            "city": search_fields.get("city", "Seattle"),
-                            "state": "WA",
-                            "zipCode": search_fields.get("zipCode", "98101"),
-                            "country": "USA"
-                        },
-                        "loyaltyCardNumber": search_fields.get("loyaltyCardNumber", f"LC{random.randint(100000, 999999)}"),
-                        "status": "Active",
-                        "createdDate": "2023-03-15T10:30:00Z",
-                        "lastPurchaseDate": "2024-01-10T14:30:00Z",
-                        "totalSpent": 1875.50,
-                        "totalOrders": 12,
-                        "tier": "Gold",
-                        "matchScore": 0.95,
-                        "matchedFields": list(search_fields.keys())
-                    },
-                    {
-                        "customerId": "CUST002",
-                        "accountNumber": "CUST002", 
-                        "firstName": "Jane",
-                        "lastName": search_fields.get("lastName", "Smith"),
-                        "email": "jane.smith@example.com",
-                        "phone": "+1-555-0124",
-                        "address": {
-                            "street": "456 Oak Avenue",
-                            "city": search_fields.get("city", "Bellevue"),
-                            "state": "WA",
-                            "zipCode": "98004",
-                            "country": "USA"
-                        },
-                        "loyaltyCardNumber": f"LC{random.randint(100000, 999999)}",
-                        "status": "Active",
-                        "createdDate": "2023-07-22T09:15:00Z",
-                        "lastPurchaseDate": "2024-01-08T11:20:00Z",
-                        "totalSpent": 945.25,
-                        "totalOrders": 7,
-                        "tier": "Silver",
-                        "matchScore": 0.87,
-                        "matchedFields": ["lastName", "city"]
+            
+            elif name == "customer_update_entity":
+                customer_id = arguments.get("customerId")
+                customer = self.db.read('customers', customer_id)
+                if not customer:
+                    return {"error": f"Customer {customer_id} not found"}
+                
+                # Prepare updates
+                updates = {}
+                for field in ["first_name", "last_name", "email", "phone", "customer_group"]:
+                    if field in arguments:
+                        updates[field] = arguments[field]
+                
+                success = self.db.update('customers', customer_id, updates)
+                if success:
+                    updated_customer = self.db.read('customers', customer_id)
+                    return {
+                        "api": f"PUT {base_url}/api/CommerceRuntime/Customers/{customer_id}",
+                        "success": True,
+                        "customer": updated_customer
                     }
-                ][:limit]
-            }
-        
-        elif name == "customer_post_nontransactional_activity_loyalty_points":
-            loyalty_card_number = arguments.get("loyaltyCardNumber")
-            customer_id = arguments.get("customerId")
-            activity_type = arguments.get("activityType")
-            points = arguments.get("points")
-            description = arguments.get("description", f"{activity_type.title()} bonus points")
+                else:
+                    return {"error": "Failed to update customer"}
             
-            transaction_id = f"NONTXN_{''.join(random.choices(string.ascii_uppercase + string.digits, k=12))}"
-            
-            return {
-                "api": f"POST {base_url}/api/CommerceRuntime/Customers/PostNonTransactionalActivityLoyaltyPoints",
-                "loyaltyCardNumber": loyalty_card_number,
-                "customerId": customer_id,
-                "transactionId": transaction_id,
-                "activityType": activity_type,
-                "points": points,
-                "description": description,
-                "status": "completed",
-                "processedTime": datetime.now().isoformat() + "Z",
-                "expirationDate": (datetime.now() + timedelta(days=365)).isoformat() + "Z",
-                "loyaltyProgram": {
-                    "programId": "PROG001",
-                    "programName": "Rewards Plus"
-                },
-                "customerDetails": {
+            elif name == "customer_get_order_history":
+                customer_id = arguments.get("customerId")
+                limit = arguments.get("limit", 10)
+                
+                customer = self.db.read('customers', customer_id)
+                if not customer:
+                    return {"error": f"Customer {customer_id} not found"}
+                
+                orders = self.db.get_customer_orders(customer_id)[:limit]
+                
+                return {
+                    "api": f"GET {base_url}/api/CommerceRuntime/Customers/{customer_id}/Orders",
                     "customerId": customer_id,
-                    "name": "Customer Name",
-                    "currentPoints": 2450 + points,
-                    "tier": "Silver",
-                    "newTier": "Gold" if (2450 + points) >= 3000 else "Silver"
-                },
-                "pointsBreakdown": {
-                    "previousBalance": 2450,
-                    "pointsAdded": points,
-                    "newBalance": 2450 + points,
-                    "pendingPoints": 0
-                },
-                "notifications": {
-                    "emailSent": True,
-                    "smsSent": False,
-                    "pushNotificationSent": True
+                    "customerName": f"{customer.get('first_name', '')} {customer.get('last_name', '')}",
+                    "orders": orders,
+                    "totalOrders": len(orders)
                 }
-            }
-        
-        else:
-            return {"error": f"Unknown customer tool: {name}"}
+            
+            elif name == "customer_search":
+                query = arguments.get("query")
+                limit = arguments.get("limit", 20)
+                
+                customers = self.db.search('customers', query, 
+                                         fields=['first_name', 'last_name', 'email', 'phone'], 
+                                         limit=limit)
+                
+                return {
+                    "api": f"GET {base_url}/api/CommerceRuntime/Customers/Search?q={query}",
+                    "query": query,
+                    "results": customers,
+                    "totalResults": len(customers)
+                }
+            
+            elif name == "customer_get_purchase_history":
+                customer_id = arguments.get("customerId")
+                limit = arguments.get("limit", 20)
+                
+                customer = self.db.read('customers', customer_id)
+                if not customer:
+                    return {"error": f"Customer {customer_id} not found"}
+                
+                orders = self.db.get_customer_orders(customer_id)[:limit]
+                
+                # Calculate purchase summary
+                total_spent = sum(order.get('total', 0) for order in orders)
+                total_orders = len(orders)
+                avg_order_value = total_spent / total_orders if total_orders > 0 else 0
+                
+                return {
+                    "api": f"GET {base_url}/api/CommerceRuntime/Customers/{customer_id}/PurchaseHistory",
+                    "customerId": customer_id,
+                    "customerName": f"{customer.get('first_name', '')} {customer.get('last_name', '')}",
+                    "purchaseHistory": orders,
+                    "summary": {
+                        "totalSpent": round(total_spent, 2),
+                        "totalOrders": total_orders,
+                        "averageOrderValue": round(avg_order_value, 2)
+                    }
+                }
+            
+            elif name == "customer_get_by_account_numbers":
+                account_numbers = arguments.get("accountNumbers", [])
+                customers = []
+                
+                for account_number in account_numbers:
+                    customer_list = self.db.list('customers', filters={'account_number': account_number})
+                    customers.extend(customer_list)
+                
+                return {
+                    "api": f"POST {base_url}/api/CommerceRuntime/Customers/GetByAccountNumbers",
+                    "accountNumbers": account_numbers,
+                    "customers": customers,
+                    "totalFound": len(customers)
+                }
+            
+            elif name == "customer_get_customer_search_fields":
+                store_id = arguments.get("storeId")
+                
+                # Return available search fields for customers
+                search_fields = [
+                    {"name": "first_name", "displayName": "First Name", "type": "string"},
+                    {"name": "last_name", "displayName": "Last Name", "type": "string"},
+                    {"name": "email", "displayName": "Email", "type": "string"},
+                    {"name": "phone", "displayName": "Phone", "type": "string"},
+                    {"name": "account_number", "displayName": "Account Number", "type": "string"},
+                    {"name": "loyalty_card_number", "displayName": "Loyalty Card", "type": "string"},
+                    {"name": "customer_group", "displayName": "Customer Group", "type": "enum",
+                     "options": ["REGULAR", "VIP", "EMPLOYEE"]}
+                ]
+                
+                return {
+                    "api": f"GET {base_url}/api/CommerceRuntime/Stores/{store_id}/CustomerSearchFields",
+                    "storeId": store_id,
+                    "searchFields": search_fields
+                }
+            
+            elif name == "customer_search_by_fields":
+                search_fields = arguments.get("searchFields", {})
+                limit = arguments.get("limit", 25)
+                
+                customers = self.db.list('customers', limit=limit, filters=search_fields)
+                
+                return {
+                    "api": f"POST {base_url}/api/CommerceRuntime/Customers/SearchByFields",
+                    "searchCriteria": search_fields,
+                    "results": customers,
+                    "totalResults": len(customers)
+                }
+            
+            elif name == "customer_post_nontransactional_activity_loyalty_points":
+                loyalty_card_number = arguments.get("loyaltyCardNumber")
+                customer_id = arguments.get("customerId")
+                activity_type = arguments.get("activityType")
+                points = arguments.get("points")
+                description = arguments.get("description", f"{activity_type.title()} bonus points")
+                
+                # Find loyalty card
+                loyalty_cards = self.db.list('loyalty_cards', 
+                                           filters={'card_number': loyalty_card_number})
+                if not loyalty_cards:
+                    return {"error": f"Loyalty card {loyalty_card_number} not found"}
+                
+                loyalty_card = loyalty_cards[0]
+                
+                # Add points transaction
+                transaction = {
+                    "id": f"LOYT{random.randint(100000, 999999)}",
+                    "date": datetime.now().isoformat(),
+                    "points": points,
+                    "type": "Earned",
+                    "activity_type": activity_type,
+                    "description": description,
+                    "customer_id": customer_id
+                }
+                
+                # Update loyalty card
+                if 'transactions' not in loyalty_card:
+                    loyalty_card['transactions'] = []
+                loyalty_card['transactions'].append(transaction)
+                loyalty_card['points_balance'] = loyalty_card.get('points_balance', 0) + points
+                
+                self.db.update('loyalty_cards', loyalty_card['id'], {
+                    'transactions': loyalty_card['transactions'],
+                    'points_balance': loyalty_card['points_balance']
+                })
+                
+                return {
+                    "api": f"POST {base_url}/api/CommerceRuntime/LoyaltyCards/{loyalty_card_number}/PostNonTransactionalActivity",
+                    "success": True,
+                    "transaction": transaction,
+                    "newBalance": loyalty_card['points_balance'],
+                    "loyaltyCard": loyalty_card_number
+                }
+            
+            else:
+                return {"error": f"Unknown customer tool: {name}"}
+                
+        except Exception as e:
+            return {"error": f"Error in {name}: {str(e)}"}

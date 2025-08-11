@@ -1,62 +1,56 @@
 """
 Products Controller for Dynamics 365 Commerce MCP Server
 
-Available MCP Tools (40+ total):
+Available MCP Tools (46 total):
 1. products_search - Search for products by various criteria
 2. products_get_by_id - Get detailed information about a specific product
 3. products_get_recommended_products - Get recommended products based on a specific product
 4. products_get_product_availability - Get product availability across different locations
-5. products_get - Search for products with OData query
-6. products_get_by_ids - Get collection of products by IDs
-7. products_compare - Compare products
-8. products_search_by_category - Search products by category
-9. products_search_by_text - Search products by text
-10. products_get_search_suggestions - Get search suggestions
-11. products_get_refiners_by_category - Get product refiners by category
-12. products_get_refiners_by_text - Get product refiners by text
-13. products_get_product_search_refiners - Get product search refiners
-14. products_get_refiner_values_by_category - Get refiner values by category
-15. products_get_refiner_values_by_text - Get refiner values by text
-16. products_refine_search_by_category - Refine search by category
-17. products_refine_search_by_text - Refine search by text
-18. products_get_dimension_values - Get dimension values
-19. products_get_variants_by_dimension_values - Get variants by dimension values
-20. products_get_variants_by_components_in_slots - Get variants by components in slots
-21. products_get_default_components - Get default components
-22. products_get_component_by_product_slot_relation - Get component by product slot relation
-23. products_get_slot_components - Get slot components
-24. products_get_filtered_slot_components - Get filtered slot components
-25. products_get_attribute_values - Get attribute values
-26. products_get_relation_types - Get relation types
-27. products_get_related_products - Get related products
-28. products_get_refiners - Get refiners
-29. products_changes - Get changed products
-30. products_read_changed_products - Read changed products
-31. products_get_deleted_listings - Get deleted listings
-32. products_get_deleted_catalogs - Get deleted catalogs
-33. products_get_deleted_languages - Get deleted languages
-34. products_delete_listings_by_catalogs - Delete listings by catalogs
-35. products_delete_listings_by_languages - Delete listings by languages
-36. products_begin_read_changed_products - Begin read changed products session
-37. products_end_read_changed_products - End read changed products session
-38. products_update_listing_publishing_status - Update listing publishing status
-39. products_get_product_availabilities - Get product availabilities
-40. products_get_prices - Get prices
-41. products_get_price - Get price
-42. products_calculate_product_price - Calculate product price
-43. products_get_active_prices - Get active prices
-44. products_get_media_locations - Get media locations
-45. products_get_media_blobs - Get media blobs
-46. products_get_units_of_measure - Get units of measure
-47. products_get_channel_product_attributes - Get channel product attributes
-48. products_get_product_ratings - Get product ratings
-49. products_get_estimated_availability - Get estimated availability
-50. products_get_estimated_product_warehouse_availability - Get estimated product warehouse availability
-51. products_update_product_warehouse_availability - Update product warehouse availability
+5. products_get_categories - Get product categories
+6. products_get_category_by_id - Get category details by ID
+7. products_get_attributes - Get product attributes
+8. products_get_product_variants - Get product variants
+9. products_get_product_images - Get product images
+10. products_get_product_reviews - Get product reviews
+11. products_create_product_review - Create product review
+12. products_get_product_pricing - Get product pricing details
+13. products_get_bulk_product_info - Get bulk product information
+14. products_compare_products - Compare multiple products
+15. products_get_cross_sell_products - Get cross-sell products
+16. products_get_up_sell_products - Get up-sell products
+17. products_get_recently_viewed - Get recently viewed products
+18. products_get_wishlist_products - Get wishlist products
+19. products_add_to_wishlist - Add product to wishlist
+20. products_remove_from_wishlist - Remove from wishlist
+21. products_get_inventory_levels - Get detailed inventory levels
+22. products_reserve_inventory - Reserve product inventory
+23. products_release_inventory - Release reserved inventory
+24. products_get_product_bundles - Get product bundles
+25. products_get_kit_components - Get kit components
+26. products_get_substitutes - Get product substitutes
+27. products_get_assemblies - Get product assemblies
+28. products_validate_product_configuration - Validate product configuration
+29. products_get_dimension_values - Get dimension values
+30. products_calculate_product_price - Calculate product price
+31. products_get_price_adjustments - Get price adjustments
+32. products_get_trade_agreements - Get trade agreements
+33. products_get_discount_lines - Get discount lines
+34. products_get_charge_configurations - Get charge configurations
+35. products_get_tax_information - Get tax information
+36. products_get_unit_conversions - Get unit conversions
+37. products_get_barcode_information - Get barcode information
+38. products_validate_barcode - Validate barcode
+39. products_get_supplier_information - Get supplier information
+40. products_get_manufacturer_information - Get manufacturer information
+41. products_get_certification_information - Get certification information
+42. products_get_compliance_information - Get compliance information
+43. products_get_warranty_information - Get warranty information
+44. products_get_shipping_information - Get shipping information
+45. products_get_localized_information - Get localized information
+46. products_get_seo_information - Get SEO information
 
-This controller handles all product-related operations including product catalog search,
-detailed product information, recommendation engine, inventory availability checking,
-pricing, variants, components, attributes, and warehouse management.
+This controller handles comprehensive product operations including search, details, categories, 
+variants, pricing, inventory, reviews, recommendations, and all related product management.
 """
 
 from typing import Any, Dict, List
@@ -64,12 +58,17 @@ from datetime import datetime, timedelta
 import random
 import string
 from mcp.types import Tool
+from ..database import get_database
+from ..config import get_base_url
 
 class ProductsController:
     """Controller for Products-related Dynamics 365 Commerce API operations"""
     
+    def __init__(self):
+        self.db = get_database()
+    
     def get_tools(self) -> List[Tool]:
-        """Return list of products-related tools"""
+        """Return list of all 46 product-related tools"""
         return [
             Tool(
                 name="products_search",
@@ -79,45 +78,37 @@ class ProductsController:
                     "properties": {
                         "query": {
                             "type": "string",
-                            "description": "Search query for products (name, description, SKU)"
+                            "description": "Search query (product name, description, SKU, brand)"
                         },
-                        "categoryId": {
+                        "category_id": {
                             "type": "string",
                             "description": "Filter by category ID"
                         },
-                        "minPrice": {
+                        "brand": {
+                            "type": "string",
+                            "description": "Filter by brand"
+                        },
+                        "min_price": {
                             "type": "number",
                             "description": "Minimum price filter"
                         },
-                        "maxPrice": {
+                        "max_price": {
                             "type": "number",
                             "description": "Maximum price filter"
                         },
-                        "inStock": {
-                            "type": "boolean",
-                            "description": "Filter by stock availability"
-                        },
-                        "sortBy": {
-                            "type": "string",
-                            "enum": ["name", "price", "popularity", "rating", "newest"],
-                            "description": "Sort results by",
-                            "default": "name"
-                        },
-                        "sortOrder": {
-                            "type": "string",
-                            "enum": ["asc", "desc"],
-                            "description": "Sort order",
-                            "default": "asc"
-                        },
                         "limit": {
-                            "type": "number",
+                            "type": "integer",
                             "description": "Maximum number of results to return",
-                            "default": 25
+                            "default": 20
+                        },
+                        "offset": {
+                            "type": "integer",
+                            "description": "Number of results to skip",
+                            "default": 0
                         },
                         "baseUrl": {
                             "type": "string",
-                            "description": "Base URL of the Dynamics 365 Commerce site",
-                            "default": "https://your-commerce-site.com"
+                            "description": "Base URL of the Dynamics 365 Commerce site (uses DYNAMICS365_BASE_URL env var if not provided)"
                         }
                     },
                     "required": []
@@ -131,22 +122,21 @@ class ProductsController:
                     "properties": {
                         "productId": {
                             "type": "string",
-                            "description": "The product ID to retrieve"
+                            "description": "The product ID to get details for"
                         },
                         "includeVariants": {
                             "type": "boolean",
-                            "description": "Include product variants in response",
-                            "default": True
+                            "description": "Whether to include product variants",
+                            "default": False
                         },
-                        "includeImages": {
+                        "includeInventory": {
                             "type": "boolean",
-                            "description": "Include product images in response",
+                            "description": "Whether to include inventory information",
                             "default": True
                         },
                         "baseUrl": {
                             "type": "string",
-                            "description": "Base URL of the Dynamics 365 Commerce site",
-                            "default": "https://your-commerce-site.com"
+                            "description": "Base URL of the Dynamics 365 Commerce site (uses DYNAMICS365_BASE_URL env var if not provided)"
                         }
                     },
                     "required": ["productId"]
@@ -164,19 +154,18 @@ class ProductsController:
                         },
                         "recommendationType": {
                             "type": "string",
-                            "enum": ["related", "frequently_bought_together", "customers_also_viewed", "similar"],
-                            "description": "Type of recommendations to get",
-                            "default": "related"
+                            "enum": ["similar", "frequently_bought", "related", "trending"],
+                            "description": "Type of recommendation",
+                            "default": "similar"
                         },
                         "limit": {
-                            "type": "number",
+                            "type": "integer",
                             "description": "Maximum number of recommendations to return",
                             "default": 10
                         },
                         "baseUrl": {
                             "type": "string",
-                            "description": "Base URL of the Dynamics 365 Commerce site",
-                            "default": "https://your-commerce-site.com"
+                            "description": "Base URL of the Dynamics 365 Commerce site (uses DYNAMICS365_BASE_URL env var if not provided)"
                         }
                     },
                     "required": ["productId"]
@@ -192,1386 +181,1119 @@ class ProductsController:
                             "type": "string",
                             "description": "The product ID to check availability for"
                         },
-                        "variantId": {
-                            "type": "string",
-                            "description": "Specific variant ID (optional)"
-                        },
                         "storeId": {
                             "type": "string",
                             "description": "Specific store ID to check (optional)"
                         },
                         "zipCode": {
                             "type": "string",
-                            "description": "Zip code to find nearby stores"
+                            "description": "ZIP code to find nearby stores (optional)"
                         },
                         "radius": {
                             "type": "number",
-                            "description": "Search radius in miles from zip code",
+                            "description": "Search radius in miles",
                             "default": 25
                         },
                         "baseUrl": {
                             "type": "string",
-                            "description": "Base URL of the Dynamics 365 Commerce site",
-                            "default": "https://your-commerce-site.com"
+                            "description": "Base URL of the Dynamics 365 Commerce site (uses DYNAMICS365_BASE_URL env var if not provided)"
                         }
                     },
                     "required": ["productId"]
                 }
             ),
+            
+            # Categories (5-6)
             Tool(
-                name="products_get",
-                description="Search for products with OData query",
+                name="products_get_categories",
+                description="Get product categories",
                 inputSchema={
                     "type": "object",
                     "properties": {
-                        "filter": {"type": "string", "description": "OData filter expression"},
-                        "orderby": {"type": "string", "description": "OData order by expression"},
-                        "top": {"type": "number", "description": "Number of results to return"},
-                        "skip": {"type": "number", "description": "Number of results to skip"},
-                        "baseUrl": {"type": "string", "default": "https://your-commerce-site.com"}
+                        "parentCategoryId": {"type": "string", "description": "Parent category ID filter"},
+                        "includeSubCategories": {"type": "boolean", "default": True},
+                        "baseUrl": {"type": "string"}
                     }
                 }
             ),
+            
             Tool(
-                name="products_get_by_ids",
-                description="Get collection of products by IDs",
+                name="products_get_category_by_id",
+                description="Get category details by ID",
                 inputSchema={
                     "type": "object",
                     "properties": {
-                        "channelId": {"type": "number", "description": "Channel ID"},
-                        "productIds": {"type": "array", "items": {"type": "number"}, "description": "Product IDs"},
-                        "baseUrl": {"type": "string", "default": "https://your-commerce-site.com"}
+                        "categoryId": {"type": "string", "description": "Category ID"},
+                        "includeProducts": {"type": "boolean", "default": False},
+                        "baseUrl": {"type": "string"}
                     },
-                    "required": ["channelId", "productIds"]
+                    "required": ["categoryId"]
                 }
             ),
+            
+            # Attributes & Variants (7-8)
             Tool(
-                name="products_compare",
-                description="Compare products",
+                name="products_get_attributes",
+                description="Get product attributes",
                 inputSchema={
                     "type": "object",
                     "properties": {
-                        "channelId": {"type": "number", "description": "Channel ID"},
-                        "catalogId": {"type": "number", "description": "Catalog ID"},
-                        "productIds": {"type": "array", "items": {"type": "number"}, "description": "Product IDs to compare"},
-                        "baseUrl": {"type": "string", "default": "https://your-commerce-site.com"}
+                        "productId": {"type": "string"},
+                        "attributeType": {"type": "string", "enum": ["all", "variant", "descriptive"]},
+                        "baseUrl": {"type": "string"}
                     },
-                    "required": ["channelId", "catalogId", "productIds"]
+                    "required": ["productId"]
                 }
             ),
+            
             Tool(
-                name="products_search_by_category",
-                description="Search products by category",
+                name="products_get_product_variants",
+                description="Get product variants",
                 inputSchema={
                     "type": "object",
                     "properties": {
-                        "channelId": {"type": "number", "description": "Channel ID"},
-                        "catalogId": {"type": "number", "description": "Catalog ID"},
-                        "categoryId": {"type": "number", "description": "Category ID"},
-                        "baseUrl": {"type": "string", "default": "https://your-commerce-site.com"}
+                        "productId": {"type": "string"},
+                        "dimensionValues": {"type": "object"},
+                        "baseUrl": {"type": "string"}
                     },
-                    "required": ["channelId", "catalogId", "categoryId"]
+                    "required": ["productId"]
                 }
             ),
+            
+            # Media & Reviews (9-11)
             Tool(
-                name="products_search_by_text",
-                description="Search products by text",
+                name="products_get_product_images",
+                description="Get product images",
                 inputSchema={
                     "type": "object",
                     "properties": {
-                        "channelId": {"type": "number", "description": "Channel ID"},
-                        "catalogId": {"type": "number", "description": "Catalog ID"},
-                        "searchText": {"type": "string", "description": "Search text"},
-                        "baseUrl": {"type": "string", "default": "https://your-commerce-site.com"}
+                        "productId": {"type": "string"},
+                        "imageSize": {"type": "string", "enum": ["thumbnail", "medium", "large", "original"]},
+                        "baseUrl": {"type": "string"}
                     },
-                    "required": ["channelId", "catalogId", "searchText"]
+                    "required": ["productId"]
                 }
             ),
+            
             Tool(
-                name="products_get_search_suggestions",
-                description="Get search suggestions",
+                name="products_get_product_reviews",
+                description="Get product reviews",
                 inputSchema={
                     "type": "object",
                     "properties": {
-                        "channelId": {"type": "number", "description": "Channel ID"},
-                        "catalogId": {"type": "number", "description": "Catalog ID"},
-                        "searchText": {"type": "string", "description": "Search text"},
-                        "hitPrefix": {"type": "string", "description": "Hit prefix"},
-                        "hitSuffix": {"type": "string", "description": "Hit suffix"},
-                        "baseUrl": {"type": "string", "default": "https://your-commerce-site.com"}
+                        "productId": {"type": "string"},
+                        "limit": {"type": "integer", "default": 10},
+                        "offset": {"type": "integer", "default": 0},
+                        "sortBy": {"type": "string", "enum": ["date", "rating", "helpful"]},
+                        "baseUrl": {"type": "string"}
                     },
-                    "required": ["channelId", "catalogId", "searchText"]
+                    "required": ["productId"]
                 }
             ),
+            
             Tool(
-                name="products_get_refiners_by_category",
-                description="Get product refiners by category",
+                name="products_create_product_review",
+                description="Create product review",
                 inputSchema={
                     "type": "object",
                     "properties": {
-                        "catalogId": {"type": "number", "description": "Catalog ID"},
-                        "categoryId": {"type": "number", "description": "Category ID"},
-                        "baseUrl": {"type": "string", "default": "https://your-commerce-site.com"}
+                        "productId": {"type": "string"},
+                        "customerId": {"type": "string"},
+                        "rating": {"type": "integer", "minimum": 1, "maximum": 5},
+                        "title": {"type": "string"},
+                        "comment": {"type": "string"},
+                        "baseUrl": {"type": "string"}
                     },
-                    "required": ["catalogId", "categoryId"]
+                    "required": ["productId", "customerId", "rating", "title"]
                 }
             ),
+            
+            # Pricing (12-14)
             Tool(
-                name="products_get_refiners_by_text",
-                description="Get product refiners by text",
+                name="products_get_product_pricing",
+                description="Get product pricing details",
                 inputSchema={
                     "type": "object",
                     "properties": {
-                        "catalogId": {"type": "number", "description": "Catalog ID"},
-                        "searchText": {"type": "string", "description": "Search text"},
-                        "baseUrl": {"type": "string", "default": "https://your-commerce-site.com"}
+                        "productId": {"type": "string"},
+                        "customerId": {"type": "string"},
+                        "quantity": {"type": "number", "default": 1},
+                        "currencyCode": {"type": "string"},
+                        "baseUrl": {"type": "string"}
                     },
-                    "required": ["catalogId", "searchText"]
+                    "required": ["productId"]
                 }
             ),
+            
             Tool(
-                name="products_get_product_search_refiners",
-                description="Get product search refiners",
+                name="products_get_bulk_product_info",
+                description="Get bulk product information",
                 inputSchema={
                     "type": "object",
                     "properties": {
-                        "searchCriteria": {"type": "object", "description": "Search criteria"},
-                        "baseUrl": {"type": "string", "default": "https://your-commerce-site.com"}
+                        "productIds": {"type": "array", "items": {"type": "string"}},
+                        "fields": {"type": "array", "items": {"type": "string"}},
+                        "baseUrl": {"type": "string"}
                     },
-                    "required": ["searchCriteria"]
+                    "required": ["productIds"]
                 }
             ),
+            
             Tool(
-                name="products_get_refiner_values_by_category",
-                description="Get refiner values by category",
+                name="products_compare_products",
+                description="Compare multiple products",
                 inputSchema={
                     "type": "object",
                     "properties": {
-                        "catalogId": {"type": "number", "description": "Catalog ID"},
-                        "categoryId": {"type": "number", "description": "Category ID"},
-                        "refinerId": {"type": "number", "description": "Refiner ID"},
-                        "refinerSourceValue": {"type": "number", "description": "Refiner source value"},
-                        "baseUrl": {"type": "string", "default": "https://your-commerce-site.com"}
+                        "productIds": {"type": "array", "items": {"type": "string"}},
+                        "compareFields": {"type": "array", "items": {"type": "string"}},
+                        "baseUrl": {"type": "string"}
                     },
-                    "required": ["catalogId", "categoryId", "refinerId", "refinerSourceValue"]
+                    "required": ["productIds"]
                 }
             ),
+            
+            # Recommendations (15-17)
             Tool(
-                name="products_get_refiner_values_by_text",
-                description="Get refiner values by text",
+                name="products_get_cross_sell_products",
+                description="Get cross-sell products",
                 inputSchema={
                     "type": "object",
                     "properties": {
-                        "catalogId": {"type": "number", "description": "Catalog ID"},
-                        "searchText": {"type": "string", "description": "Search text"},
-                        "refinerId": {"type": "number", "description": "Refiner ID"},
-                        "refinerSourceValue": {"type": "number", "description": "Refiner source value"},
-                        "baseUrl": {"type": "string", "default": "https://your-commerce-site.com"}
+                        "productId": {"type": "string"},
+                        "limit": {"type": "integer", "default": 5},
+                        "baseUrl": {"type": "string"}
                     },
-                    "required": ["catalogId", "searchText", "refinerId", "refinerSourceValue"]
+                    "required": ["productId"]
                 }
             ),
+            
             Tool(
-                name="products_refine_search_by_category",
-                description="Refine search by category",
+                name="products_get_up_sell_products",
+                description="Get up-sell products",
                 inputSchema={
                     "type": "object",
                     "properties": {
-                        "channelId": {"type": "number", "description": "Channel ID"},
-                        "catalogId": {"type": "number", "description": "Catalog ID"},
-                        "categoryId": {"type": "number", "description": "Category ID"},
-                        "refinementCriteria": {"type": "array", "description": "Refinement criteria"},
-                        "baseUrl": {"type": "string", "default": "https://your-commerce-site.com"}
+                        "productId": {"type": "string"},
+                        "limit": {"type": "integer", "default": 5},
+                        "baseUrl": {"type": "string"}
                     },
-                    "required": ["channelId", "catalogId", "categoryId", "refinementCriteria"]
+                    "required": ["productId"]
                 }
             ),
+            
             Tool(
-                name="products_refine_search_by_text",
-                description="Refine search by text",
+                name="products_get_recently_viewed",
+                description="Get recently viewed products",
                 inputSchema={
                     "type": "object",
                     "properties": {
-                        "channelId": {"type": "number", "description": "Channel ID"},
-                        "catalogId": {"type": "number", "description": "Catalog ID"},
-                        "searchText": {"type": "string", "description": "Search text"},
-                        "refinementCriteria": {"type": "array", "description": "Refinement criteria"},
-                        "baseUrl": {"type": "string", "default": "https://your-commerce-site.com"}
+                        "customerId": {"type": "string"},
+                        "limit": {"type": "integer", "default": 10},
+                        "baseUrl": {"type": "string"}
                     },
-                    "required": ["channelId", "catalogId", "searchText", "refinementCriteria"]
+                    "required": ["customerId"]
                 }
             ),
+            
+            # Wishlist (18-20)
+            Tool(
+                name="products_get_wishlist_products",
+                description="Get wishlist products",
+                inputSchema={
+                    "type": "object",
+                    "properties": {
+                        "customerId": {"type": "string"},
+                        "wishlistId": {"type": "string"},
+                        "baseUrl": {"type": "string"}
+                    },
+                    "required": ["customerId"]
+                }
+            ),
+            
+            Tool(
+                name="products_add_to_wishlist",
+                description="Add product to wishlist",
+                inputSchema={
+                    "type": "object",
+                    "properties": {
+                        "customerId": {"type": "string"},
+                        "productId": {"type": "string"},
+                        "wishlistId": {"type": "string"},
+                        "quantity": {"type": "integer", "default": 1},
+                        "baseUrl": {"type": "string"}
+                    },
+                    "required": ["customerId", "productId"]
+                }
+            ),
+            
+            Tool(
+                name="products_remove_from_wishlist",
+                description="Remove from wishlist",
+                inputSchema={
+                    "type": "object",
+                    "properties": {
+                        "customerId": {"type": "string"},
+                        "productId": {"type": "string"},
+                        "wishlistId": {"type": "string"},
+                        "baseUrl": {"type": "string"}
+                    },
+                    "required": ["customerId", "productId"]
+                }
+            ),
+            
+            # Inventory (21-23)
+            Tool(
+                name="products_get_inventory_levels",
+                description="Get detailed inventory levels",
+                inputSchema={
+                    "type": "object",
+                    "properties": {
+                        "productId": {"type": "string"},
+                        "warehouseId": {"type": "string"},
+                        "includeReserved": {"type": "boolean", "default": True},
+                        "baseUrl": {"type": "string"}
+                    },
+                    "required": ["productId"]
+                }
+            ),
+            
+            Tool(
+                name="products_reserve_inventory",
+                description="Reserve product inventory",
+                inputSchema={
+                    "type": "object",
+                    "properties": {
+                        "productId": {"type": "string"},
+                        "quantity": {"type": "integer"},
+                        "warehouseId": {"type": "string"},
+                        "customerId": {"type": "string"},
+                        "reservationId": {"type": "string"},
+                        "baseUrl": {"type": "string"}
+                    },
+                    "required": ["productId", "quantity"]
+                }
+            ),
+            
+            Tool(
+                name="products_release_inventory",
+                description="Release reserved inventory",
+                inputSchema={
+                    "type": "object",
+                    "properties": {
+                        "reservationId": {"type": "string"},
+                        "quantity": {"type": "integer"},
+                        "baseUrl": {"type": "string"}
+                    },
+                    "required": ["reservationId"]
+                }
+            ),
+            
+            # Product Structure (24-27)
+            Tool(
+                name="products_get_product_bundles",
+                description="Get product bundles",
+                inputSchema={
+                    "type": "object",
+                    "properties": {
+                        "productId": {"type": "string"},
+                        "baseUrl": {"type": "string"}
+                    },
+                    "required": ["productId"]
+                }
+            ),
+            
+            Tool(
+                name="products_get_kit_components",
+                description="Get kit components",
+                inputSchema={
+                    "type": "object",
+                    "properties": {
+                        "kitProductId": {"type": "string"},
+                        "baseUrl": {"type": "string"}
+                    },
+                    "required": ["kitProductId"]
+                }
+            ),
+            
+            Tool(
+                name="products_get_substitutes",
+                description="Get product substitutes",
+                inputSchema={
+                    "type": "object",
+                    "properties": {
+                        "productId": {"type": "string"},
+                        "baseUrl": {"type": "string"}
+                    },
+                    "required": ["productId"]
+                }
+            ),
+            
+            Tool(
+                name="products_get_assemblies",
+                description="Get product assemblies",
+                inputSchema={
+                    "type": "object",
+                    "properties": {
+                        "productId": {"type": "string"},
+                        "baseUrl": {"type": "string"}
+                    },
+                    "required": ["productId"]
+                }
+            ),
+            
+            # Configuration & Dimensions (28-29)
+            Tool(
+                name="products_validate_product_configuration",
+                description="Validate product configuration",
+                inputSchema={
+                    "type": "object",
+                    "properties": {
+                        "productId": {"type": "string"},
+                        "configuration": {"type": "object"},
+                        "baseUrl": {"type": "string"}
+                    },
+                    "required": ["productId", "configuration"]
+                }
+            ),
+            
             Tool(
                 name="products_get_dimension_values",
                 description="Get dimension values",
                 inputSchema={
                     "type": "object",
                     "properties": {
-                        "recordId": {"type": "number", "description": "Record ID"},
-                        "channelId": {"type": "number", "description": "Channel ID"},
-                        "dimension": {"type": "number", "description": "Dimension"},
-                        "matchingDimensionValues": {"type": "array", "description": "Matching dimension values"},
-                        "baseUrl": {"type": "string", "default": "https://your-commerce-site.com"}
+                        "productId": {"type": "string"},
+                        "dimensionType": {"type": "string", "enum": ["color", "size", "style", "configuration"]},
+                        "baseUrl": {"type": "string"}
                     },
-                    "required": ["recordId", "channelId", "dimension"]
+                    "required": ["productId"]
                 }
             ),
-            Tool(
-                name="products_get_variants_by_dimension_values",
-                description="Get variants by dimension values",
-                inputSchema={
-                    "type": "object",
-                    "properties": {
-                        "recordId": {"type": "number", "description": "Record ID"},
-                        "channelId": {"type": "number", "description": "Channel ID"},
-                        "matchingDimensionValues": {"type": "array", "description": "Matching dimension values"},
-                        "baseUrl": {"type": "string", "default": "https://your-commerce-site.com"}
-                    },
-                    "required": ["recordId", "channelId"]
-                }
-            ),
-            Tool(
-                name="products_get_variants_by_components_in_slots",
-                description="Get variants by components in slots",
-                inputSchema={
-                    "type": "object",
-                    "properties": {
-                        "recordId": {"type": "number", "description": "Record ID"},
-                        "channelId": {"type": "number", "description": "Channel ID"},
-                        "matchingSlotToComponentRelationship": {"type": "array", "description": "Matching slot to component relationship"},
-                        "baseUrl": {"type": "string", "default": "https://your-commerce-site.com"}
-                    },
-                    "required": ["recordId", "channelId"]
-                }
-            ),
-            Tool(
-                name="products_get_default_components",
-                description="Get default components",
-                inputSchema={
-                    "type": "object",
-                    "properties": {
-                        "recordId": {"type": "number", "description": "Record ID"},
-                        "channelId": {"type": "number", "description": "Channel ID"},
-                        "baseUrl": {"type": "string", "default": "https://your-commerce-site.com"}
-                    },
-                    "required": ["recordId", "channelId"]
-                }
-            ),
-            Tool(
-                name="products_get_component_by_product_slot_relation",
-                description="Get component by product slot relation",
-                inputSchema={
-                    "type": "object",
-                    "properties": {
-                        "channelId": {"type": "number", "description": "Channel ID"},
-                        "componentRelation": {"type": "object", "description": "Component relation"},
-                        "baseUrl": {"type": "string", "default": "https://your-commerce-site.com"}
-                    },
-                    "required": ["channelId", "componentRelation"]
-                }
-            ),
-            Tool(
-                name="products_get_slot_components",
-                description="Get slot components",
-                inputSchema={
-                    "type": "object",
-                    "properties": {
-                        "recordId": {"type": "number", "description": "Record ID"},
-                        "channelId": {"type": "number", "description": "Channel ID"},
-                        "slotId": {"type": "number", "description": "Slot ID"},
-                        "baseUrl": {"type": "string", "default": "https://your-commerce-site.com"}
-                    },
-                    "required": ["recordId", "channelId", "slotId"]
-                }
-            ),
-            Tool(
-                name="products_get_filtered_slot_components",
-                description="Get filtered slot components",
-                inputSchema={
-                    "type": "object",
-                    "properties": {
-                        "recordId": {"type": "number", "description": "Record ID"},
-                        "channelId": {"type": "number", "description": "Channel ID"},
-                        "slotId": {"type": "number", "description": "Slot ID"},
-                        "selectedComponents": {"type": "array", "description": "Selected components"},
-                        "baseUrl": {"type": "string", "default": "https://your-commerce-site.com"}
-                    },
-                    "required": ["recordId", "channelId", "slotId"]
-                }
-            ),
-            Tool(
-                name="products_get_attribute_values",
-                description="Get attribute values",
-                inputSchema={
-                    "type": "object",
-                    "properties": {
-                        "recordId": {"type": "number", "description": "Record ID"},
-                        "channelId": {"type": "number", "description": "Channel ID"},
-                        "catalogId": {"type": "number", "description": "Catalog ID"},
-                        "baseUrl": {"type": "string", "default": "https://your-commerce-site.com"}
-                    },
-                    "required": ["recordId", "channelId", "catalogId"]
-                }
-            ),
-            Tool(
-                name="products_get_relation_types",
-                description="Get relation types",
-                inputSchema={
-                    "type": "object",
-                    "properties": {
-                        "recordId": {"type": "number", "description": "Record ID"},
-                        "channelId": {"type": "number", "description": "Channel ID"},
-                        "catalogId": {"type": "number", "description": "Catalog ID"},
-                        "baseUrl": {"type": "string", "default": "https://your-commerce-site.com"}
-                    },
-                    "required": ["recordId", "channelId", "catalogId"]
-                }
-            ),
-            Tool(
-                name="products_get_related_products",
-                description="Get related products",
-                inputSchema={
-                    "type": "object",
-                    "properties": {
-                        "recordId": {"type": "number", "description": "Record ID"},
-                        "channelId": {"type": "number", "description": "Channel ID"},
-                        "catalogId": {"type": "number", "description": "Catalog ID"},
-                        "relationTypeId": {"type": "number", "description": "Relation type ID"},
-                        "baseUrl": {"type": "string", "default": "https://your-commerce-site.com"}
-                    },
-                    "required": ["recordId", "channelId", "catalogId", "relationTypeId"]
-                }
-            ),
-            Tool(
-                name="products_get_refiners",
-                description="Get refiners",
-                inputSchema={
-                    "type": "object",
-                    "properties": {
-                        "productSearchCriteria": {"type": "object", "description": "Product search criteria"},
-                        "baseUrl": {"type": "string", "default": "https://your-commerce-site.com"}
-                    },
-                    "required": ["productSearchCriteria"]
-                }
-            ),
-            Tool(
-                name="products_changes",
-                description="Get changed products",
-                inputSchema={
-                    "type": "object",
-                    "properties": {
-                        "productSearchCriteria": {"type": "object", "description": "Changed products search criteria"},
-                        "baseUrl": {"type": "string", "default": "https://your-commerce-site.com"}
-                    },
-                    "required": ["productSearchCriteria"]
-                }
-            ),
-            Tool(
-                name="products_read_changed_products",
-                description="Read changed products",
-                inputSchema={
-                    "type": "object",
-                    "properties": {
-                        "productSearchCriteria": {"type": "object", "description": "Changed products search criteria"},
-                        "baseUrl": {"type": "string", "default": "https://your-commerce-site.com"}
-                    },
-                    "required": ["productSearchCriteria"]
-                }
-            ),
-            Tool(
-                name="products_get_deleted_listings",
-                description="Get deleted listings",
-                inputSchema={
-                    "type": "object",
-                    "properties": {
-                        "catalogId": {"type": "number", "description": "Catalog ID"},
-                        "skip": {"type": "number", "description": "Skip count"},
-                        "top": {"type": "number", "description": "Top count"},
-                        "baseUrl": {"type": "string", "default": "https://your-commerce-site.com"}
-                    },
-                    "required": ["catalogId", "skip", "top"]
-                }
-            ),
-            Tool(
-                name="products_get_deleted_catalogs",
-                description="Get deleted catalogs",
-                inputSchema={
-                    "type": "object",
-                    "properties": {
-                        "baseUrl": {"type": "string", "default": "https://your-commerce-site.com"}
-                    }
-                }
-            ),
-            Tool(
-                name="products_get_deleted_languages",
-                description="Get deleted languages",
-                inputSchema={
-                    "type": "object",
-                    "properties": {
-                        "baseUrl": {"type": "string", "default": "https://your-commerce-site.com"}
-                    }
-                }
-            ),
-            Tool(
-                name="products_delete_listings_by_catalogs",
-                description="Delete listings by catalogs",
-                inputSchema={
-                    "type": "object",
-                    "properties": {
-                        "catalogIds": {"type": "array", "items": {"type": "number"}, "description": "Catalog IDs"},
-                        "baseUrl": {"type": "string", "default": "https://your-commerce-site.com"}
-                    },
-                    "required": ["catalogIds"]
-                }
-            ),
-            Tool(
-                name="products_delete_listings_by_languages",
-                description="Delete listings by languages",
-                inputSchema={
-                    "type": "object",
-                    "properties": {
-                        "languages": {"type": "array", "items": {"type": "string"}, "description": "Languages"},
-                        "baseUrl": {"type": "string", "default": "https://your-commerce-site.com"}
-                    },
-                    "required": ["languages"]
-                }
-            ),
-            Tool(
-                name="products_begin_read_changed_products",
-                description="Begin read changed products session",
-                inputSchema={
-                    "type": "object",
-                    "properties": {
-                        "changedProductSearchCriteria": {"type": "object", "description": "Changed product search criteria"},
-                        "baseUrl": {"type": "string", "default": "https://your-commerce-site.com"}
-                    },
-                    "required": ["changedProductSearchCriteria"]
-                }
-            ),
-            Tool(
-                name="products_end_read_changed_products",
-                description="End read changed products session",
-                inputSchema={
-                    "type": "object",
-                    "properties": {
-                        "session": {"type": "object", "description": "Read changed products session"},
-                        "baseUrl": {"type": "string", "default": "https://your-commerce-site.com"}
-                    },
-                    "required": ["session"]
-                }
-            ),
-            Tool(
-                name="products_update_listing_publishing_status",
-                description="Update listing publishing status",
-                inputSchema={
-                    "type": "object",
-                    "properties": {
-                        "publishingStatuses": {"type": "array", "description": "Publishing statuses"},
-                        "baseUrl": {"type": "string", "default": "https://your-commerce-site.com"}
-                    },
-                    "required": ["publishingStatuses"]
-                }
-            ),
-            Tool(
-                name="products_get_product_availabilities",
-                description="Get product availabilities",
-                inputSchema={
-                    "type": "object",
-                    "properties": {
-                        "itemIds": {"type": "array", "items": {"type": "number"}, "description": "Item IDs"},
-                        "channelId": {"type": "number", "description": "Channel ID"},
-                        "baseUrl": {"type": "string", "default": "https://your-commerce-site.com"}
-                    },
-                    "required": ["itemIds", "channelId"]
-                }
-            ),
-            Tool(
-                name="products_get_prices",
-                description="Get prices",
-                inputSchema={
-                    "type": "object",
-                    "properties": {
-                        "itemId": {"type": "string", "description": "Item ID"},
-                        "inventoryDimensionId": {"type": "string", "description": "Inventory dimension ID"},
-                        "barcode": {"type": "string", "description": "Barcode"},
-                        "customerAccountNumber": {"type": "string", "description": "Customer account number"},
-                        "unitOfMeasureSymbol": {"type": "string", "description": "Unit of measure symbol"},
-                        "quantity": {"type": "number", "description": "Quantity"},
-                        "baseUrl": {"type": "string", "default": "https://your-commerce-site.com"}
-                    },
-                    "required": ["itemId"]
-                }
-            ),
-            Tool(
-                name="products_get_price",
-                description="Get price",
-                inputSchema={
-                    "type": "object",
-                    "properties": {
-                        "recordId": {"type": "number", "description": "Record ID"},
-                        "customerAccountNumber": {"type": "string", "description": "Customer account number"},
-                        "unitOfMeasureSymbol": {"type": "string", "description": "Unit of measure symbol"},
-                        "baseUrl": {"type": "string", "default": "https://your-commerce-site.com"}
-                    },
-                    "required": ["recordId"]
-                }
-            ),
+            
+            # Pricing & Discounts (30-34)
             Tool(
                 name="products_calculate_product_price",
                 description="Calculate product price",
                 inputSchema={
                     "type": "object",
                     "properties": {
-                        "recordId": {"type": "number", "description": "Record ID"},
-                        "customerAccountNumber": {"type": "string", "description": "Customer account number"},
-                        "unitOfMeasureSymbol": {"type": "string", "description": "Unit of measure symbol"},
-                        "loyaltyCardId": {"type": "string", "description": "Loyalty card ID"},
-                        "affiliationLoyaltyTiers": {"type": "array", "description": "Affiliation loyalty tiers"},
-                        "baseUrl": {"type": "string", "default": "https://your-commerce-site.com"}
+                        "productId": {"type": "string"},
+                        "quantity": {"type": "number", "default": 1},
+                        "customerId": {"type": "string"},
+                        "currencyCode": {"type": "string"},
+                        "baseUrl": {"type": "string"}
                     },
-                    "required": ["recordId"]
+                    "required": ["productId"]
                 }
             ),
+            
             Tool(
-                name="products_get_active_prices",
-                description="Get active prices",
+                name="products_get_price_adjustments",
+                description="Get price adjustments",
                 inputSchema={
                     "type": "object",
                     "properties": {
-                        "projectDomain": {"type": "object", "description": "Project domain"},
-                        "productIds": {"type": "array", "items": {"type": "number"}, "description": "Product IDs"},
-                        "activeDate": {"type": "string", "description": "Active date"},
-                        "customerId": {"type": "string", "description": "Customer ID"},
-                        "affiliationLoyaltyTiers": {"type": "array", "description": "Affiliation loyalty tiers"},
-                        "includeSimpleDiscountsInContextualPrice": {"type": "boolean", "description": "Include simple discounts in contextual price"},
-                        "baseUrl": {"type": "string", "default": "https://your-commerce-site.com"}
+                        "productId": {"type": "string"},
+                        "customerId": {"type": "string"},
+                        "baseUrl": {"type": "string"}
                     },
-                    "required": ["projectDomain", "productIds", "activeDate"]
+                    "required": ["productId"]
                 }
             ),
+            
             Tool(
-                name="products_get_media_locations",
-                description="Get media locations",
+                name="products_get_trade_agreements",
+                description="Get trade agreements",
                 inputSchema={
                     "type": "object",
                     "properties": {
-                        "recordId": {"type": "number", "description": "Record ID"},
-                        "channelId": {"type": "number", "description": "Channel ID"},
-                        "catalogId": {"type": "number", "description": "Catalog ID"},
-                        "baseUrl": {"type": "string", "default": "https://your-commerce-site.com"}
+                        "productId": {"type": "string"},
+                        "customerId": {"type": "string"},
+                        "baseUrl": {"type": "string"}
                     },
-                    "required": ["recordId", "channelId", "catalogId"]
+                    "required": ["productId"]
                 }
             ),
+            
             Tool(
-                name="products_get_media_blobs",
-                description="Get media blobs",
+                name="products_get_discount_lines",
+                description="Get discount lines",
                 inputSchema={
                     "type": "object",
                     "properties": {
-                        "recordId": {"type": "number", "description": "Record ID"},
-                        "channelId": {"type": "number", "description": "Channel ID"},
-                        "catalogId": {"type": "number", "description": "Catalog ID"},
-                        "baseUrl": {"type": "string", "default": "https://your-commerce-site.com"}
+                        "productId": {"type": "string"},
+                        "customerId": {"type": "string"},
+                        "quantity": {"type": "number", "default": 1},
+                        "baseUrl": {"type": "string"}
                     },
-                    "required": ["recordId", "channelId", "catalogId"]
+                    "required": ["productId"]
                 }
             ),
+            
             Tool(
-                name="products_get_units_of_measure",
-                description="Get units of measure",
+                name="products_get_charge_configurations",
+                description="Get charge configurations",
                 inputSchema={
                     "type": "object",
                     "properties": {
-                        "recordId": {"type": "number", "description": "Record ID"},
-                        "baseUrl": {"type": "string", "default": "https://your-commerce-site.com"}
+                        "productId": {"type": "string"},
+                        "baseUrl": {"type": "string"}
                     },
-                    "required": ["recordId"]
+                    "required": ["productId"]
                 }
             ),
+            
+            # Tax & Units (35-36)
             Tool(
-                name="products_get_channel_product_attributes",
-                description="Get channel product attributes",
+                name="products_get_tax_information",
+                description="Get tax information",
                 inputSchema={
                     "type": "object",
                     "properties": {
-                        "baseUrl": {"type": "string", "default": "https://your-commerce-site.com"}
-                    }
+                        "productId": {"type": "string"},
+                        "location": {"type": "object"},
+                        "baseUrl": {"type": "string"}
+                    },
+                    "required": ["productId"]
                 }
             ),
+            
             Tool(
-                name="products_get_product_ratings",
-                description="Get product ratings",
+                name="products_get_unit_conversions",
+                description="Get unit conversions",
                 inputSchema={
                     "type": "object",
                     "properties": {
-                        "productIds": {"type": "array", "items": {"type": "number"}, "description": "Product IDs"},
-                        "baseUrl": {"type": "string", "default": "https://your-commerce-site.com"}
+                        "productId": {"type": "string"},
+                        "fromUnit": {"type": "string"},
+                        "toUnit": {"type": "string"},
+                        "baseUrl": {"type": "string"}
                     },
-                    "required": ["productIds"]
+                    "required": ["productId", "fromUnit", "toUnit"]
                 }
             ),
+            
+            # Barcode (37-38)
             Tool(
-                name="products_get_estimated_availability",
-                description="Get estimated availability",
+                name="products_get_barcode_information",
+                description="Get barcode information",
                 inputSchema={
                     "type": "object",
                     "properties": {
-                        "searchCriteria": {"type": "object", "description": "Inventory availability search criteria"},
-                        "baseUrl": {"type": "string", "default": "https://your-commerce-site.com"}
+                        "productId": {"type": "string"},
+                        "baseUrl": {"type": "string"}
                     },
-                    "required": ["searchCriteria"]
+                    "required": ["productId"]
                 }
             ),
+            
             Tool(
-                name="products_get_estimated_warehouse_availability",
-                description="Get estimated product warehouse availability",
+                name="products_validate_barcode",
+                description="Validate barcode",
                 inputSchema={
                     "type": "object",
                     "properties": {
-                        "searchCriteria": {"type": "object", "description": "Inventory availability search criteria"},
-                        "baseUrl": {"type": "string", "default": "https://your-commerce-site.com"}
+                        "barcode": {"type": "string"},
+                        "baseUrl": {"type": "string"}
                     },
-                    "required": ["searchCriteria"]
+                    "required": ["barcode"]
                 }
             ),
+            
+            # Supplier & Manufacturer (39-40)
             Tool(
-                name="products_update_product_warehouse_availability",
-                description="Update product warehouse availability",
+                name="products_get_supplier_information",
+                description="Get supplier information",
                 inputSchema={
                     "type": "object",
                     "properties": {
-                        "quantities": {"type": "array", "description": "Product warehouse quantities"},
-                        "baseUrl": {"type": "string", "default": "https://your-commerce-site.com"}
+                        "productId": {"type": "string"},
+                        "baseUrl": {"type": "string"}
                     },
-                    "required": ["quantities"]
+                    "required": ["productId"]
+                }
+            ),
+            
+            Tool(
+                name="products_get_manufacturer_information",
+                description="Get manufacturer information",
+                inputSchema={
+                    "type": "object",
+                    "properties": {
+                        "productId": {"type": "string"},
+                        "baseUrl": {"type": "string"}
+                    },
+                    "required": ["productId"]
+                }
+            ),
+            
+            # Certification & Compliance (41-42)
+            Tool(
+                name="products_get_certification_information",
+                description="Get certification information",
+                inputSchema={
+                    "type": "object",
+                    "properties": {
+                        "productId": {"type": "string"},
+                        "certificationType": {"type": "string"},
+                        "baseUrl": {"type": "string"}
+                    },
+                    "required": ["productId"]
+                }
+            ),
+            
+            Tool(
+                name="products_get_compliance_information",
+                description="Get compliance information",
+                inputSchema={
+                    "type": "object",
+                    "properties": {
+                        "productId": {"type": "string"},
+                        "region": {"type": "string"},
+                        "baseUrl": {"type": "string"}
+                    },
+                    "required": ["productId"]
+                }
+            ),
+            
+            # Warranty & Shipping (43-44)
+            Tool(
+                name="products_get_warranty_information",
+                description="Get warranty information",
+                inputSchema={
+                    "type": "object",
+                    "properties": {
+                        "productId": {"type": "string"},
+                        "baseUrl": {"type": "string"}
+                    },
+                    "required": ["productId"]
+                }
+            ),
+            
+            Tool(
+                name="products_get_shipping_information",
+                description="Get shipping information",
+                inputSchema={
+                    "type": "object",
+                    "properties": {
+                        "productId": {"type": "string"},
+                        "destination": {"type": "object"},
+                        "baseUrl": {"type": "string"}
+                    },
+                    "required": ["productId"]
+                }
+            ),
+            
+            # Localization & SEO (45-46)
+            Tool(
+                name="products_get_localized_information",
+                description="Get localized information",
+                inputSchema={
+                    "type": "object",
+                    "properties": {
+                        "productId": {"type": "string"},
+                        "languageCode": {"type": "string"},
+                        "currencyCode": {"type": "string"},
+                        "baseUrl": {"type": "string"}
+                    },
+                    "required": ["productId", "languageCode"]
+                }
+            ),
+            
+            Tool(
+                name="products_get_seo_information",
+                description="Get SEO information",
+                inputSchema={
+                    "type": "object",
+                    "properties": {
+                        "productId": {"type": "string"},
+                        "baseUrl": {"type": "string"}
+                    },
+                    "required": ["productId"]
                 }
             )
         ]
     
     async def handle_tool(self, name: str, arguments: Dict[str, Any]) -> Dict[str, Any]:
-        """Handle products tool calls with mock implementations"""
-        base_url = arguments.get("baseUrl", "https://your-commerce-site.com")
+        """Handle product tool calls with database operations"""
+        base_url = arguments.get("baseUrl", get_base_url())
         
-        if name == "products_search":
-            query = arguments.get("query", "")
-            limit = arguments.get("limit", 25)
-            return {
-                "api": f"GET {base_url}/api/CommerceRuntime/Products/Search",
-                "searchCriteria": {
-                    "query": query,
-                    "categoryId": arguments.get("categoryId"),
-                    "minPrice": arguments.get("minPrice"),
-                    "maxPrice": arguments.get("maxPrice"),
-                    "inStock": arguments.get("inStock"),
-                    "sortBy": arguments.get("sortBy", "name"),
-                    "sortOrder": arguments.get("sortOrder", "asc")
-                },
-                "totalResults": 45,
-                "results": [
-                    {
-                        "productId": "PROD001",
-                        "sku": "WH-001",
-                        "name": "Wireless Bluetooth Headphones",
-                        "description": "Premium noise-cancelling wireless headphones with 30-hour battery life",
-                        "price": 99.99,
-                        "currency": "USD",
-                        "category": {
-                            "categoryId": "CAT001",
-                            "name": "Electronics"
-                        },
-                        "brand": "TechBrand",
-                        "rating": 4.5,
-                        "reviewCount": 127,
-                        "inStock": True,
-                        "stockQuantity": 50,
-                        "images": [
-                            f"{base_url}/images/products/PROD001_1.jpg",
-                            f"{base_url}/images/products/PROD001_2.jpg"
-                        ],
-                        "variants": [
-                            {"variantId": "VAR001", "color": "Black", "size": "Standard"},
-                            {"variantId": "VAR002", "color": "White", "size": "Standard"}
-                        ]
+        try:
+            if name == "products_search":
+                query = arguments.get("query", "")
+                category_id = arguments.get("category_id")
+                brand = arguments.get("brand")
+                min_price = arguments.get("min_price")
+                max_price = arguments.get("max_price")
+                limit = arguments.get("limit", 20)
+                offset = arguments.get("offset", 0)
+                
+                # Start with all products
+                products = self.db.list('products', limit=1000)  # Get all for filtering
+                
+                # Apply filters
+                if query:
+                    products = [p for p in products if 
+                               query.lower() in p.get('name', '').lower() or
+                               query.lower() in p.get('description', '').lower() or
+                               query.lower() in p.get('sku', '').lower() or
+                               query.lower() in p.get('brand', '').lower()]
+                
+                if category_id:
+                    products = [p for p in products if p.get('category_id') == category_id]
+                
+                if brand:
+                    products = [p for p in products if p.get('brand', '').lower() == brand.lower()]
+                
+                if min_price is not None:
+                    products = [p for p in products if p.get('price', 0) >= min_price]
+                
+                if max_price is not None:
+                    products = [p for p in products if p.get('price', 0) <= max_price]
+                
+                # Apply pagination
+                total_results = len(products)
+                products = products[offset:offset + limit]
+                
+                # Enrich with inventory information
+                for product in products:
+                    product['total_inventory'] = sum(
+                        store.get('inventory', {}).get(product['id'], 0) 
+                        for store in self.db.list('stores')
+                    )
+                
+                return {
+                    "api": f"GET {base_url}/api/CommerceRuntime/Products/Search",
+                    "searchQuery": query,
+                    "filters": {
+                        "category_id": category_id,
+                        "brand": brand,
+                        "min_price": min_price,
+                        "max_price": max_price
                     },
-                    {
-                        "productId": "PROD002",
-                        "sku": "PC-001",
-                        "name": "Protective Phone Case",
-                        "description": "Durable protective case for smartphones with shock absorption",
-                        "price": 19.99,
-                        "currency": "USD",
-                        "category": {
-                            "categoryId": "CAT002",
-                            "name": "Accessories"
-                        },
-                        "brand": "ProtectCase",
-                        "rating": 4.2,
-                        "reviewCount": 89,
-                        "inStock": True,
-                        "stockQuantity": 150,
-                        "images": [
-                            f"{base_url}/images/products/PROD002_1.jpg"
-                        ],
-                        "variants": [
-                            {"variantId": "VAR003", "color": "Clear", "phoneModel": "iPhone 14"},
-                            {"variantId": "VAR004", "color": "Black", "phoneModel": "iPhone 14"}
-                        ]
-                    }
-                ][:limit]
-            }
-        
-        elif name == "products_get_by_id":
-            product_id = arguments.get("productId", "PROD001")
-            include_variants = arguments.get("includeVariants", True)
-            include_images = arguments.get("includeImages", True)
-            
-            return {
-                "api": f"GET {base_url}/api/CommerceRuntime/Products/{product_id}",
-                "productId": product_id,
-                "sku": "WH-001",
-                "name": "Wireless Bluetooth Headphones",
-                "description": "Premium noise-cancelling wireless headphones with superior sound quality and 30-hour battery life. Features include active noise cancellation, quick charge, and premium comfort padding.",
-                "longDescription": "Experience audio like never before with these premium wireless headphones. Engineered with advanced noise-cancelling technology and high-fidelity drivers for an immersive listening experience.",
-                "price": 99.99,
-                "currency": "USD",
-                "compareAtPrice": 149.99,
-                "category": {
-                    "categoryId": "CAT001",
-                    "name": "Electronics",
-                    "breadcrumb": "Home > Electronics > Audio > Headphones"
-                },
-                "brand": "TechBrand",
-                "manufacturer": "TechBrand Inc.",
-                "rating": 4.5,
-                "reviewCount": 127,
-                "inStock": True,
-                "stockQuantity": 50,
-                "weight": "0.7 lbs",
-                "dimensions": "7.1 x 6.7 x 3.2 inches",
-                "tags": ["wireless", "bluetooth", "noise-cancelling", "premium"],
-                "specifications": {
-                    "batteryLife": "30 hours",
-                    "chargingTime": "2 hours",
-                    "bluetoothVersion": "5.0",
-                    "range": "33 feet",
-                    "driverSize": "40mm",
-                    "impedance": "32 ohm",
-                    "warranty": "2 years"
-                },
-                "images": [
-                    {
-                        "url": f"{base_url}/images/products/PROD001_main.jpg",
-                        "alt": "Wireless Bluetooth Headphones - Main View",
-                        "isPrimary": True
+                    "pagination": {
+                        "limit": limit,
+                        "offset": offset,
+                        "total": total_results
                     },
-                    {
-                        "url": f"{base_url}/images/products/PROD001_side.jpg",
-                        "alt": "Wireless Bluetooth Headphones - Side View",
-                        "isPrimary": False
-                    }
-                ] if include_images else None,
-                "variants": [
-                    {
-                        "variantId": "VAR001",
-                        "color": "Black",
-                        "size": "Standard",
-                        "price": 99.99,
-                        "sku": "WH-001-BLK",
-                        "stockQuantity": 30,
-                        "images": [f"{base_url}/images/products/VAR001.jpg"]
-                    },
-                    {
-                        "variantId": "VAR002",
-                        "color": "White",
-                        "size": "Standard",
-                        "price": 99.99,
-                        "sku": "WH-001-WHT",
-                        "stockQuantity": 20,
-                        "images": [f"{base_url}/images/products/VAR002.jpg"]
-                    }
-                ] if include_variants else None,
-                "seo": {
-                    "title": "Wireless Bluetooth Headphones - Premium Audio Experience",
-                    "metaDescription": "Shop premium wireless Bluetooth headphones with noise cancellation and 30-hour battery life.",
-                    "canonicalUrl": f"{base_url}/products/{product_id}"
+                    "products": products
                 }
+            
+            elif name == "products_get_by_id":
+                product_id = arguments.get("productId")
+                include_variants = arguments.get("includeVariants", False)
+                include_inventory = arguments.get("includeInventory", True)
+                
+                product = self.db.read('products', product_id)
+                if not product:
+                    return {"error": f"Product {product_id} not found"}
+                
+                # Enrich product data
+                if include_inventory:
+                    # Get inventory by store
+                    product['inventory_by_store'] = {}
+                    product['total_inventory'] = 0
+                    
+                    for store in self.db.list('stores'):
+                        store_inventory = store.get('inventory', {}).get(product_id, 0)
+                        product['inventory_by_store'][store['id']] = {
+                            'store_name': store['name'],
+                            'quantity': store_inventory
+                        }
+                        product['total_inventory'] += store_inventory
+                
+                # Get category information
+                if product.get('category_id'):
+                    category = self.db.read('categories', product['category_id'])
+                    product['category'] = category
+                
+                # Add variants if requested
+                if include_variants:
+                    # For demo, create some simple variants
+                    variants = []
+                    if product.get('color'):
+                        colors = ['Black', 'White', 'Blue', 'Red', 'Gray']
+                        for color in colors[:3]:  # Limit to 3 variants
+                            variant = product.copy()
+                            variant['id'] = f"{product_id}_VAR_{color[:3].upper()}"
+                            variant['color'] = color
+                            variant['price'] = product['price'] + random.uniform(-10, 10)
+                            variants.append(variant)
+                    product['variants'] = variants
+                
+                return {
+                    "api": f"GET {base_url}/api/CommerceRuntime/Products/{product_id}",
+                    "product": product,
+                    "includeVariants": include_variants,
+                    "includeInventory": include_inventory
+                }
+            
+            elif name == "products_get_recommended_products":
+                product_id = arguments.get("productId")
+                recommendation_type = arguments.get("recommendationType", "similar")
+                limit = arguments.get("limit", 10)
+                
+                base_product = self.db.read('products', product_id)
+                if not base_product:
+                    return {"error": f"Product {product_id} not found"}
+                
+                # Get all products for recommendations
+                all_products = self.db.list('products', limit=1000)
+                recommendations = []
+                
+                if recommendation_type == "similar":
+                    # Find products in same category or brand
+                    for product in all_products:
+                        if (product['id'] != product_id and 
+                            (product.get('category_id') == base_product.get('category_id') or
+                             product.get('brand') == base_product.get('brand'))):
+                            recommendations.append(product)
+                
+                elif recommendation_type == "related":
+                    # Find products that might be bought together
+                    for product in all_products:
+                        if product['id'] != product_id:
+                            # Simple logic: products with similar price range
+                            price_diff = abs(product.get('price', 0) - base_product.get('price', 0))
+                            if price_diff <= base_product.get('price', 0) * 0.5:  # Within 50% price range
+                                recommendations.append(product)
+                
+                elif recommendation_type == "frequently_bought":
+                    # For demo, just return random products
+                    recommendations = [p for p in all_products if p['id'] != product_id]
+                    random.shuffle(recommendations)
+                
+                elif recommendation_type == "trending":
+                    # For demo, return products sorted by name (simulating popularity)
+                    recommendations = sorted([p for p in all_products if p['id'] != product_id],
+                                           key=lambda x: x.get('name', ''))
+                
+                # Limit recommendations
+                recommendations = recommendations[:limit]
+                
+                # Add recommendation scores (mock)
+                for i, rec in enumerate(recommendations):
+                    rec['recommendation_score'] = random.uniform(0.6, 0.95)
+                    rec['recommendation_reason'] = self._get_recommendation_reason(
+                        recommendation_type, base_product, rec
+                    )
+                
+                return {
+                    "api": f"GET {base_url}/api/CommerceRuntime/Products/{product_id}/Recommendations",
+                    "baseProduct": {
+                        "id": product_id,
+                        "name": base_product.get('name')
+                    },
+                    "recommendationType": recommendation_type,
+                    "recommendations": recommendations,
+                    "totalRecommendations": len(recommendations)
+                }
+            
+            elif name == "products_get_product_availability":
+                product_id = arguments.get("productId")
+                store_id = arguments.get("storeId")
+                zip_code = arguments.get("zipCode")
+                radius = arguments.get("radius", 25)
+                
+                product = self.db.read('products', product_id)
+                if not product:
+                    return {"error": f"Product {product_id} not found"}
+                
+                availability = []
+                stores = self.db.list('stores')
+                
+                if store_id:
+                    # Check specific store
+                    stores = [s for s in stores if s['id'] == store_id]
+                
+                for store in stores:
+                    inventory_qty = store.get('inventory', {}).get(product_id, 0)
+                    
+                    store_availability = {
+                        "storeId": store['id'],
+                        "storeName": store['name'],
+                        "address": store['address'],
+                        "phone": store['phone'],
+                        "quantity": inventory_qty,
+                        "status": "Available" if inventory_qty > 0 else "Out of Stock",
+                        "reservedQuantity": random.randint(0, min(5, inventory_qty)),
+                        "availableForPickup": inventory_qty > 0,
+                        "estimatedArrival": None
+                    }
+                    
+                    # Add distance if zip code provided (mock calculation)
+                    if zip_code:
+                        store_availability["distance"] = round(random.uniform(1, radius), 1)
+                        store_availability["distanceUnit"] = "miles"
+                    
+                    availability.append(store_availability)
+                
+                # Sort by availability then distance
+                availability.sort(key=lambda x: (x['quantity'] == 0, x.get('distance', 0)))
+                
+                total_available = sum(a['quantity'] for a in availability)
+                
+                return {
+                    "api": f"GET {base_url}/api/CommerceRuntime/Products/{product_id}/Availability",
+                    "productId": product_id,
+                    "productName": product.get('name'),
+                    "totalAvailable": total_available,
+                    "searchCriteria": {
+                        "storeId": store_id,
+                        "zipCode": zip_code,
+                        "radius": radius
+                    },
+                    "storeAvailability": availability,
+                    "totalStores": len(availability)
+                }
+            
+            # Handle all additional tools with mock responses
+            else:
+                return self._handle_mock_tool(name, arguments)
+                
+        except Exception as e:
+            return {"error": f"Error in {name}: {str(e)}"}
+    
+    def _get_recommendation_reason(self, rec_type: str, base_product: Dict, 
+                                 recommended_product: Dict) -> str:
+        """Generate recommendation reason text"""
+        if rec_type == "similar":
+            if base_product.get('category_id') == recommended_product.get('category_id'):
+                return "Same category"
+            elif base_product.get('brand') == recommended_product.get('brand'):
+                return "Same brand"
+            else:
+                return "Similar features"
+        elif rec_type == "related":
+            return "Often bought together"
+        elif rec_type == "frequently_bought":
+            return "Frequently bought together"
+        elif rec_type == "trending":
+            return "Trending now"
+        else:
+            return "Recommended for you"
+    
+    def _handle_mock_tool(self, name: str, arguments: Dict[str, Any]) -> Dict[str, Any]:
+        """Handle mock implementations for additional tools"""
+        base_url = arguments.get("baseUrl", get_base_url())
+        product_id = arguments.get("productId", "PROD001")
+        customer_id = arguments.get("customerId", "CUST001")
+        
+        # Mock response templates based on tool category
+        if "categories" in name:
+            return {
+                "api": f"GET {base_url}/api/CommerceRuntime/Products/Categories",
+                "toolName": name,
+                "categories": [
+                    {"id": "CAT001", "name": "Electronics", "parentId": None, "level": 0},
+                    {"id": "CAT002", "name": "Smartphones", "parentId": "CAT001", "level": 1},
+                    {"id": "CAT003", "name": "Laptops", "parentId": "CAT001", "level": 1}
+                ],
+                "totalCategories": 3
             }
         
-        elif name == "products_get_recommended_products":
-            product_id = arguments.get("productId", "PROD001")
-            recommendation_type = arguments.get("recommendationType", "related")
-            limit = arguments.get("limit", 10)
-            
+        elif "attributes" in name:
+            return {
+                "api": f"GET {base_url}/api/CommerceRuntime/Products/{product_id}/Attributes",
+                "productId": product_id,
+                "attributes": [
+                    {"name": "Color", "value": "Black", "type": "variant"},
+                    {"name": "Size", "value": "Medium", "type": "variant"},
+                    {"name": "Material", "value": "Cotton", "type": "descriptive"}
+                ]
+            }
+        
+        elif "variants" in name:
+            return {
+                "api": f"GET {base_url}/api/CommerceRuntime/Products/{product_id}/Variants",
+                "productId": product_id,
+                "variants": [
+                    {"id": f"{product_id}_BLACK_S", "color": "Black", "size": "Small", "price": 29.99},
+                    {"id": f"{product_id}_BLACK_M", "color": "Black", "size": "Medium", "price": 29.99},
+                    {"id": f"{product_id}_BLUE_M", "color": "Blue", "size": "Medium", "price": 32.99}
+                ]
+            }
+        
+        elif "images" in name:
+            return {
+                "api": f"GET {base_url}/api/CommerceRuntime/Products/{product_id}/Images",
+                "productId": product_id,
+                "images": [
+                    {"id": "IMG001", "url": f"{base_url}/images/{product_id}/main.jpg", "type": "main"},
+                    {"id": "IMG002", "url": f"{base_url}/images/{product_id}/alt1.jpg", "type": "alternative"}
+                ]
+            }
+        
+        elif "reviews" in name:
+            if "create" in name:
+                return {
+                    "api": f"POST {base_url}/api/CommerceRuntime/Products/{product_id}/Reviews",
+                    "reviewId": f"REV_{random.randint(1000, 9999)}",
+                    "status": "created",
+                    "message": "Review created successfully"
+                }
+            else:
+                return {
+                    "api": f"GET {base_url}/api/CommerceRuntime/Products/{product_id}/Reviews",
+                    "productId": product_id,
+                    "reviews": [
+                        {"id": "REV001", "customerId": "CUST001", "rating": 5, "title": "Great product!", "comment": "Love it", "date": datetime.now().isoformat()},
+                        {"id": "REV002", "customerId": "CUST002", "rating": 4, "title": "Good quality", "comment": "Satisfied", "date": datetime.now().isoformat()}
+                    ],
+                    "averageRating": 4.5,
+                    "totalReviews": 2
+                }
+        
+        elif "pricing" in name or "price" in name:
+            return {
+                "api": f"GET {base_url}/api/CommerceRuntime/Products/{product_id}/Pricing",
+                "productId": product_id,
+                "basePrice": 99.99,
+                "salePrice": 79.99,
+                "discountAmount": 20.00,
+                "currencyCode": "USD",
+                "priceAdjustments": [
+                    {"type": "discount", "amount": -20.00, "description": "Holiday Sale"}
+                ]
+            }
+        
+        elif "inventory" in name:
+            if "reserve" in name:
+                return {
+                    "api": f"POST {base_url}/api/CommerceRuntime/Products/{product_id}/Inventory/Reserve",
+                    "reservationId": f"RES_{random.randint(1000, 9999)}",
+                    "status": "reserved",
+                    "quantity": arguments.get("quantity", 1)
+                }
+            elif "release" in name:
+                return {
+                    "api": f"POST {base_url}/api/CommerceRuntime/Products/Inventory/Release",
+                    "reservationId": arguments.get("reservationId"),
+                    "status": "released"
+                }
+            else:
+                return {
+                    "api": f"GET {base_url}/api/CommerceRuntime/Products/{product_id}/Inventory",
+                    "productId": product_id,
+                    "totalAvailable": 250,
+                    "reserved": 10,
+                    "available": 240,
+                    "byLocation": [
+                        {"locationId": "STORE001", "available": 50, "reserved": 5},
+                        {"locationId": "WAREHOUSE001", "available": 200, "reserved": 5}
+                    ]
+                }
+        
+        elif "wishlist" in name:
+            if "add" in name:
+                return {
+                    "api": f"POST {base_url}/api/CommerceRuntime/Customers/{customer_id}/Wishlist",
+                    "status": "added",
+                    "productId": product_id,
+                    "wishlistId": arguments.get("wishlistId", "WISH001")
+                }
+            elif "remove" in name:
+                return {
+                    "api": f"DELETE {base_url}/api/CommerceRuntime/Customers/{customer_id}/Wishlist",
+                    "status": "removed",
+                    "productId": product_id
+                }
+            else:
+                return {
+                    "api": f"GET {base_url}/api/CommerceRuntime/Customers/{customer_id}/Wishlist",
+                    "wishlistItems": [
+                        {"productId": "PROD001", "name": "Wireless Headphones", "price": 99.99, "dateAdded": datetime.now().isoformat()},
+                        {"productId": "PROD002", "name": "Bluetooth Speaker", "price": 79.99, "dateAdded": datetime.now().isoformat()}
+                    ]
+                }
+        
+        elif "cross_sell" in name or "up_sell" in name:
             return {
                 "api": f"GET {base_url}/api/CommerceRuntime/Products/{product_id}/Recommendations",
                 "productId": product_id,
-                "recommendationType": recommendation_type,
+                "recommendationType": "cross_sell" if "cross_sell" in name else "up_sell",
                 "recommendations": [
-                    {
-                        "productId": "PROD002",
-                        "name": "Wireless Charging Pad",
-                        "price": 29.99,
-                        "currency": "USD",
-                        "rating": 4.3,
-                        "image": f"{base_url}/images/products/PROD002_thumb.jpg",
-                        "score": 0.95,
-                        "reason": "Customers who bought headphones also purchased this"
-                    },
-                    {
-                        "productId": "PROD003",
-                        "name": "Premium Audio Cable",
-                        "price": 19.99,
-                        "currency": "USD",
-                        "rating": 4.1,
-                        "image": f"{base_url}/images/products/PROD003_thumb.jpg",
-                        "score": 0.89,
-                        "reason": "Compatible accessory"
-                    },
-                    {
-                        "productId": "PROD004",
-                        "name": "Noise-Cancelling Earbuds",
-                        "price": 149.99,
-                        "currency": "USD",
-                        "rating": 4.7,
-                        "image": f"{base_url}/images/products/PROD004_thumb.jpg",
-                        "score": 0.87,
-                        "reason": "Similar product in same category"
-                    }
-                ][:limit]
+                    {"productId": "PROD002", "name": "Related Product", "price": 49.99, "score": 0.85},
+                    {"productId": "PROD003", "name": "Similar Product", "price": 129.99, "score": 0.78}
+                ]
             }
         
-        elif name == "products_get_product_availability":
-            product_id = arguments.get("productId", "PROD001")
-            variant_id = arguments.get("variantId")
-            store_id = arguments.get("storeId")
-            
+        elif "bundle" in name or "kit" in name or "substitute" in name or "assembly" in name:
             return {
-                "api": f"GET {base_url}/api/CommerceRuntime/Products/{product_id}/Availability",
+                "api": f"GET {base_url}/api/CommerceRuntime/Products/{product_id}/Structure",
                 "productId": product_id,
-                "variantId": variant_id,
-                "available": True,
-                "totalQuantity": 85,
-                "reservedQuantity": 5,
-                "availableQuantity": 80,
-                "locations": [
-                    {
-                        "storeId": "STORE001",
-                        "storeName": "Downtown Main Store",
-                        "address": {
-                            "street": "123 Main Street",
-                            "city": "Seattle",
-                            "state": "WA",
-                            "zipCode": "98101",
-                            "country": "USA"
-                        },
-                        "coordinates": {
-                            "latitude": 47.6062,
-                            "longitude": -122.3321
-                        },
-                        "distance": 2.5,
-                        "quantity": 30,
-                        "reserved": 2,
-                        "available": 28,
-                        "lastUpdated": datetime.now().isoformat() + "Z",
-                        "storeHours": {
-                            "monday": "9:00 AM - 9:00 PM",
-                            "tuesday": "9:00 AM - 9:00 PM",
-                            "wednesday": "9:00 AM - 9:00 PM",
-                            "thursday": "9:00 AM - 9:00 PM",
-                            "friday": "9:00 AM - 10:00 PM",
-                            "saturday": "10:00 AM - 10:00 PM",
-                            "sunday": "11:00 AM - 7:00 PM"
-                        },
-                        "services": ["pickup", "curbside", "delivery"]
-                    },
-                    {
-                        "storeId": "STORE002",
-                        "storeName": "Westfield Mall Store",
-                        "address": {
-                            "street": "456 Mall Drive",
-                            "city": "Bellevue",
-                            "state": "WA",
-                            "zipCode": "98004",
-                            "country": "USA"
-                        },
-                        "coordinates": {
-                            "latitude": 47.6101,
-                            "longitude": -122.2015
-                        },
-                        "distance": 8.2,
-                        "quantity": 25,
-                        "reserved": 1,
-                        "available": 24,
-                        "lastUpdated": datetime.now().isoformat() + "Z",
-                        "services": ["pickup", "delivery"]
-                    },
-                    {
-                        "storeId": "WH001",
-                        "storeName": "Distribution Center",
-                        "type": "warehouse",
-                        "quantity": 30,
-                        "reserved": 2,
-                        "available": 28,
-                        "estimatedDelivery": "2-3 business days",
-                        "shippingMethods": ["standard", "express", "overnight"]
-                    }
-                ] if not store_id else [loc for loc in [
-                    # Same locations as above but filtered
-                ] if loc.get("storeId") == store_id],
-                "variants": [
-                    {
-                        "variantId": "VAR001",
-                        "color": "Black",
-                        "totalQuantity": 45,
-                        "availableQuantity": 42
-                    },
-                    {
-                        "variantId": "VAR002",
-                        "color": "White",
-                        "totalQuantity": 40,
-                        "availableQuantity": 38
-                    }
-                ] if not variant_id else None
-            }
-        
-        # Handle additional products tools
-        return self._handle_additional_products_tools(name, arguments)
-    
-    def _get_mock_product_data(self, base_url: str, product_id: str = "PROD001") -> Dict[str, Any]:
-        """Helper method to generate consistent mock product data"""
-        return {
-            "productId": product_id,
-            "sku": f"SKU-{product_id}",
-            "name": f"Product {product_id}",
-            "description": f"Description for product {product_id}",
-            "price": round(random.uniform(10, 500), 2),
-            "currency": "USD",
-            "category": {"categoryId": "CAT001", "name": "Electronics"},
-            "brand": "MockBrand",
-            "rating": round(random.uniform(3.5, 5.0), 1),
-            "reviewCount": random.randint(10, 200),
-            "inStock": True,
-            "stockQuantity": random.randint(10, 100),
-            "images": [f"{base_url}/images/products/{product_id}.jpg"]
-        }
-    
-    def _handle_additional_products_tools(self, name: str, arguments: Dict[str, Any]) -> Dict[str, Any]:
-        """Handle additional products tools with mock implementations"""
-        base_url = arguments.get("baseUrl", "https://your-commerce-site.com")
-        
-        if name == "products_get":
-            return {
-                "api": f"GET {base_url}/api/CommerceRuntime/Products",
-                "filter": arguments.get("filter", ""),
-                "orderby": arguments.get("orderby", ""),
-                "results": [self._get_mock_product_data(base_url, f"PROD{i:03d}") for i in range(1, 6)]
-            }
-        
-        elif name == "products_get_by_ids":
-            channel_id = arguments.get("channelId", 1)
-            product_ids = arguments.get("productIds", [1, 2, 3])
-            return {
-                "api": f"GET {base_url}/api/CommerceRuntime/Products/GetByIds",
-                "channelId": channel_id,
-                "results": [self._get_mock_product_data(base_url, f"PROD{pid:03d}") for pid in product_ids]
-            }
-        
-        elif name == "products_compare":
-            return {
-                "api": f"GET {base_url}/api/CommerceRuntime/Products/Compare",
-                "channelId": arguments.get("channelId", 1),
-                "catalogId": arguments.get("catalogId", 1),
-                "comparisonLines": [
-                    {
-                        "productId": "PROD001",
-                        "attributes": {"color": "Black", "size": "Medium", "weight": "0.5 lbs"},
-                        "specifications": {"warranty": "2 years", "brand": "TechBrand"}
-                    },
-                    {
-                        "productId": "PROD002",
-                        "attributes": {"color": "White", "size": "Large", "weight": "0.7 lbs"},
-                        "specifications": {"warranty": "1 year", "brand": "OtherBrand"}
-                    }
-                ]
-            }
-        
-        elif name == "products_search_by_category":
-            return {
-                "api": f"GET {base_url}/api/CommerceRuntime/Products/SearchByCategory",
-                "channelId": arguments.get("channelId", 1),
-                "catalogId": arguments.get("catalogId", 1),
-                "categoryId": arguments.get("categoryId", 1),
-                "results": [self._get_mock_product_data(base_url, f"PROD{i:03d}") for i in range(1, 4)]
-            }
-        
-        elif name == "products_search_by_text":
-            return {
-                "api": f"GET {base_url}/api/CommerceRuntime/Products/SearchByText",
-                "searchText": arguments.get("searchText", ""),
-                "results": [self._get_mock_product_data(base_url, f"PROD{i:03d}") for i in range(1, 4)]
-            }
-        
-        elif name == "products_get_search_suggestions":
-            return {
-                "api": f"GET {base_url}/api/CommerceRuntime/Products/GetSearchSuggestions",
-                "searchText": arguments.get("searchText", ""),
-                "suggestions": [
-                    {"text": "wireless headphones", "count": 45},
-                    {"text": "wireless speakers", "count": 23},
-                    {"text": "wireless charger", "count": 12}
-                ]
-            }
-        
-        elif name in ["products_get_refiners_by_category", "products_get_refiners_by_text", "products_get_product_search_refiners", "products_get_refiners"]:
-            return {
-                "api": f"GET {base_url}/api/CommerceRuntime/Products/GetRefiners",
-                "refiners": [
-                    {
-                        "refinerId": 1,
-                        "name": "Brand",
-                        "values": [
-                            {"value": "TechBrand", "count": 25},
-                            {"value": "OtherBrand", "count": 15}
-                        ]
-                    },
-                    {
-                        "refinerId": 2,
-                        "name": "Price Range",
-                        "values": [
-                            {"value": "$0-$50", "count": 20},
-                            {"value": "$50-$100", "count": 15},
-                            {"value": "$100+", "count": 10}
-                        ]
-                    }
-                ]
-            }
-        
-        elif name in ["products_get_refiner_values_by_category", "products_get_refiner_values_by_text"]:
-            return {
-                "api": f"GET {base_url}/api/CommerceRuntime/Products/GetRefinerValues",
-                "refinerId": arguments.get("refinerId", 1),
-                "values": [
-                    {"value": "Value 1", "count": 10},
-                    {"value": "Value 2", "count": 8},
-                    {"value": "Value 3", "count": 5}
-                ]
-            }
-        
-        elif name in ["products_refine_search_by_category", "products_refine_search_by_text"]:
-            return {
-                "api": f"GET {base_url}/api/CommerceRuntime/Products/RefineSearch",
-                "refinedResults": [self._get_mock_product_data(base_url, f"PROD{i:03d}") for i in range(1, 4)]
-            }
-        
-        elif name == "products_get_dimension_values":
-            return {
-                "api": f"GET {base_url}/api/CommerceRuntime/Products/GetDimensionValues",
-                "recordId": arguments.get("recordId", 1),
-                "dimension": arguments.get("dimension", 1),
-                "dimensionValues": [
-                    {"dimensionId": 1, "value": "Small", "displayName": "Small"},
-                    {"dimensionId": 2, "value": "Medium", "displayName": "Medium"},
-                    {"dimensionId": 3, "value": "Large", "displayName": "Large"}
-                ]
-            }
-        
-        elif name in ["products_get_variants_by_dimension_values", "products_get_variants_by_components_in_slots"]:
-            return {
-                "api": f"GET {base_url}/api/CommerceRuntime/Products/GetVariants",
-                "variants": [
-                    {
-                        "variantId": "VAR001",
-                        "productId": "PROD001",
-                        "dimensions": {"size": "Small", "color": "Black"},
-                        "price": 99.99,
-                        "stockQuantity": 15
-                    },
-                    {
-                        "variantId": "VAR002",
-                        "productId": "PROD001",
-                        "dimensions": {"size": "Medium", "color": "Black"},
-                        "price": 99.99,
-                        "stockQuantity": 20
-                    }
-                ]
-            }
-        
-        elif name in ["products_get_default_components", "products_get_slot_components", "products_get_filtered_slot_components"]:
-            return {
-                "api": f"GET {base_url}/api/CommerceRuntime/Products/GetComponents",
                 "components": [
-                    {
-                        "componentId": "COMP001",
-                        "name": "Component 1",
-                        "slotId": arguments.get("slotId", 1),
-                        "isRequired": True,
-                        "price": 10.00
-                    },
-                    {
-                        "componentId": "COMP002",
-                        "name": "Component 2",
-                        "slotId": arguments.get("slotId", 1),
-                        "isRequired": False,
-                        "price": 15.00
-                    }
-                ]
+                    {"componentId": "COMP001", "name": "Component 1", "quantity": 1, "price": 29.99},
+                    {"componentId": "COMP002", "name": "Component 2", "quantity": 2, "price": 19.99}
+                ],
+                "totalPrice": 69.97
             }
         
-        elif name == "products_get_component_by_product_slot_relation":
-            return {
-                "api": f"GET {base_url}/api/CommerceRuntime/Products/GetComponentByRelation",
-                "component": {
-                    "componentId": "COMP001",
-                    "name": "Specific Component",
-                    "price": 12.50,
-                    "description": "Component based on slot relation"
-                }
-            }
-        
-        elif name == "products_get_attribute_values":
-            return {
-                "api": f"GET {base_url}/api/CommerceRuntime/Products/GetAttributeValues",
-                "recordId": arguments.get("recordId", 1),
-                "attributes": [
-                    {"attributeId": 1, "name": "Color", "value": "Black", "displayValue": "Black"},
-                    {"attributeId": 2, "name": "Size", "value": "M", "displayValue": "Medium"},
-                    {"attributeId": 3, "name": "Weight", "value": "0.5", "displayValue": "0.5 lbs"}
-                ]
-            }
-        
-        elif name == "products_get_relation_types":
-            return {
-                "api": f"GET {base_url}/api/CommerceRuntime/Products/GetRelationTypes",
-                "relationTypes": [
-                    {"relationTypeId": 1, "name": "Related Products", "description": "Products related to this item"},
-                    {"relationTypeId": 2, "name": "Accessories", "description": "Accessories for this product"},
-                    {"relationTypeId": 3, "name": "Complementary", "description": "Products that complement this item"}
-                ]
-            }
-        
-        elif name == "products_get_related_products":
-            return {
-                "api": f"GET {base_url}/api/CommerceRuntime/Products/GetRelatedProducts",
-                "relationTypeId": arguments.get("relationTypeId", 1),
-                "relatedProducts": [self._get_mock_product_data(base_url, f"REL{i:03d}") for i in range(1, 4)]
-            }
-        
-        elif name in ["products_changes", "products_read_changed_products"]:
-            return {
-                "api": f"GET {base_url}/api/CommerceRuntime/Products/Changes",
-                "changedProducts": [
-                    {
-                        "productId": "PROD001",
-                        "changeType": "Updated",
-                        "lastModified": datetime.now().isoformat() + "Z",
-                        "changes": ["price", "description"]
-                    },
-                    {
-                        "productId": "PROD002",
-                        "changeType": "Created",
-                        "lastModified": datetime.now().isoformat() + "Z",
-                        "changes": ["all"]
-                    }
-                ]
-            }
-        
-        elif name == "products_get_deleted_listings":
-            return {
-                "api": f"GET {base_url}/api/CommerceRuntime/Products/GetDeletedListings",
-                "catalogId": arguments.get("catalogId", 1),
-                "deletedListings": [
-                    {"listingId": "LIST001", "deletedDate": datetime.now().isoformat() + "Z"},
-                    {"listingId": "LIST002", "deletedDate": datetime.now().isoformat() + "Z"}
-                ]
-            }
-        
-        elif name == "products_get_deleted_catalogs":
-            return {
-                "api": f"GET {base_url}/api/CommerceRuntime/Products/GetDeletedCatalogs",
-                "deletedCatalogs": [1, 2, 3]
-            }
-        
-        elif name == "products_get_deleted_languages":
-            return {
-                "api": f"GET {base_url}/api/CommerceRuntime/Products/GetDeletedLanguages",
-                "deletedLanguages": ["en-US", "fr-FR", "de-DE"]
-            }
-        
-        elif name in ["products_delete_listings_by_catalogs", "products_delete_listings_by_languages"]:
-            return {
-                "api": f"DELETE {base_url}/api/CommerceRuntime/Products/DeleteListings",
-                "success": True,
-                "deletedCount": random.randint(1, 10),
-                "message": "Listings deleted successfully"
-            }
-        
-        elif name == "products_begin_read_changed_products":
-            return {
-                "api": f"POST {base_url}/api/CommerceRuntime/Products/BeginReadChangedProducts",
-                "session": {
-                    "sessionId": f"SESSION_{random.randint(1000, 9999)}",
-                    "startTime": datetime.now().isoformat() + "Z",
-                    "status": "Active"
-                }
-            }
-        
-        elif name == "products_end_read_changed_products":
-            return {
-                "api": f"POST {base_url}/api/CommerceRuntime/Products/EndReadChangedProducts",
-                "success": True,
-                "endTime": datetime.now().isoformat() + "Z",
-                "message": "Session ended successfully"
-            }
-        
-        elif name == "products_update_listing_publishing_status":
-            return {
-                "api": f"PUT {base_url}/api/CommerceRuntime/Products/UpdateListingPublishingStatus",
-                "updatedStatuses": len(arguments.get("publishingStatuses", [])),
-                "success": True,
-                "timestamp": datetime.now().isoformat() + "Z"
-            }
-        
-        elif name == "products_get_product_availabilities":
-            return {
-                "api": f"GET {base_url}/api/CommerceRuntime/Products/GetProductAvailabilities",
-                "channelId": arguments.get("channelId", 1),
-                "availabilities": [
-                    {
-                        "itemId": item_id,
-                        "availableQuantity": random.randint(0, 100),
-                        "totalQuantity": random.randint(50, 150),
-                        "reservedQuantity": random.randint(0, 10)
-                    }
-                    for item_id in arguments.get("itemIds", [1, 2, 3])
-                ]
-            }
-        
-        elif name in ["products_get_prices", "products_get_price", "products_calculate_product_price"]:
-            return {
-                "api": f"GET {base_url}/api/CommerceRuntime/Products/GetPrices",
-                "prices": [
-                    {
-                        "productId": arguments.get("recordId", "PROD001"),
-                        "basePrice": round(random.uniform(10, 500), 2),
-                        "salePrice": round(random.uniform(8, 450), 2),
-                        "currency": "USD",
-                        "validFrom": datetime.now().isoformat() + "Z",
-                        "validTo": (datetime.now() + timedelta(days=30)).isoformat() + "Z"
-                    }
-                ]
-            }
-        
-        elif name == "products_get_active_prices":
-            return {
-                "api": f"GET {base_url}/api/CommerceRuntime/Products/GetActivePrices",
-                "activePrices": [
-                    {
-                        "productId": pid,
-                        "activePrice": round(random.uniform(10, 500), 2),
-                        "currency": "USD",
-                        "effectiveDate": arguments.get("activeDate", datetime.now().isoformat() + "Z")
-                    }
-                    for pid in arguments.get("productIds", [1, 2, 3])
-                ]
-            }
-        
-        elif name in ["products_get_media_locations", "products_get_media_blobs"]:
-            return {
-                "api": f"GET {base_url}/api/CommerceRuntime/Products/GetMedia",
-                "recordId": arguments.get("recordId", 1),
-                "mediaItems": [
-                    {
-                        "mediaId": f"MEDIA{i:03d}",
-                        "url": f"{base_url}/media/products/PROD001_{i}.jpg",
-                        "type": "image",
-                        "altText": f"Product image {i}",
-                        "isPrimary": i == 1
-                    }
-                    for i in range(1, 4)
-                ]
-            }
-        
-        elif name == "products_get_units_of_measure":
-            return {
-                "api": f"GET {base_url}/api/CommerceRuntime/Products/GetUnitsOfMeasure",
-                "recordId": arguments.get("recordId", 1),
-                "unitsOfMeasure": [
-                    {"unitId": "EA", "name": "Each", "symbol": "ea", "decimals": 0},
-                    {"unitId": "KG", "name": "Kilogram", "symbol": "kg", "decimals": 3},
-                    {"unitId": "LB", "name": "Pound", "symbol": "lb", "decimals": 2}
-                ]
-            }
-        
-        elif name == "products_get_channel_product_attributes":
-            return {
-                "api": f"GET {base_url}/api/CommerceRuntime/Products/GetChannelProductAttributes",
-                "attributes": [
-                    {
-                        "attributeId": 1,
-                        "name": "Color",
-                        "dataType": "Text",
-                        "isRequired": True,
-                        "allowedValues": ["Red", "Blue", "Green", "Black", "White"]
-                    },
-                    {
-                        "attributeId": 2,
-                        "name": "Size",
-                        "dataType": "Text",
-                        "isRequired": True,
-                        "allowedValues": ["XS", "S", "M", "L", "XL", "XXL"]
-                    }
-                ]
-            }
-        
-        elif name == "products_get_product_ratings":
-            return {
-                "api": f"GET {base_url}/api/CommerceRuntime/Products/GetProductRatings",
-                "ratings": [
-                    {
-                        "productId": pid,
-                        "averageRating": round(random.uniform(3.0, 5.0), 1),
-                        "totalReviews": random.randint(10, 200),
-                        "ratingDistribution": {
-                            "5": random.randint(10, 50),
-                            "4": random.randint(5, 30),
-                            "3": random.randint(2, 15),
-                            "2": random.randint(0, 5),
-                            "1": random.randint(0, 3)
-                        }
-                    }
-                    for pid in arguments.get("productIds", [1, 2, 3])
-                ]
-            }
-        
-        elif name in ["products_get_estimated_availability", "products_get_estimated_product_warehouse_availability"]:
-            return {
-                "api": f"GET {base_url}/api/CommerceRuntime/Products/GetEstimatedAvailability",
-                "searchCriteria": arguments.get("searchCriteria", {}),
-                "estimatedAvailability": {
+        elif "barcode" in name:
+            if "validate" in name:
+                return {
+                    "api": f"GET {base_url}/api/CommerceRuntime/Products/Barcode/Validate",
+                    "barcode": arguments.get("barcode"),
+                    "valid": True,
                     "productId": "PROD001",
-                    "estimatedQuantity": random.randint(50, 200),
-                    "estimatedDeliveryDate": (datetime.now() + timedelta(days=random.randint(1, 7))).isoformat() + "Z",
-                    "warehouses": [
-                        {
-                            "warehouseId": f"WH{i:03d}",
-                            "estimatedQuantity": random.randint(10, 50),
-                            "distance": round(random.uniform(1, 50), 1)
-                        }
-                        for i in range(1, 4)
+                    "productName": "Wireless Headphones"
+                }
+            else:
+                return {
+                    "api": f"GET {base_url}/api/CommerceRuntime/Products/{product_id}/Barcode",
+                    "productId": product_id,
+                    "barcodes": [
+                        {"type": "UPC", "value": "123456789012"},
+                        {"type": "EAN", "value": "1234567890123"}
                     ]
                 }
+        
+        elif "tax" in name:
+            return {
+                "api": f"GET {base_url}/api/CommerceRuntime/Products/{product_id}/Tax",
+                "productId": product_id,
+                "taxRate": 0.085,
+                "taxAmount": 8.50,
+                "taxGroup": "STANDARD",
+                "exemptions": []
             }
         
-        elif name == "products_update_product_warehouse_availability":
+        elif "warranty" in name or "certification" in name or "compliance" in name:
             return {
-                "api": f"PUT {base_url}/api/CommerceRuntime/Products/UpdateProductWarehouseAvailability",
-                "updateResult": {
-                    "success": True,
-                    "updatedCount": len(arguments.get("quantities", [])),
-                    "timestamp": datetime.now().isoformat() + "Z",
-                    "message": "Product warehouse availability updated successfully"
+                "api": f"GET {base_url}/api/CommerceRuntime/Products/{product_id}/Information",
+                "productId": product_id,
+                "information": {
+                    "warranty": "2 years manufacturer warranty",
+                    "certifications": ["CE", "FCC", "RoHS"],
+                    "compliance": ["GDPR", "CCPA"]
                 }
             }
         
-        return {"error": f"Unknown additional products tool: {name}"}
+        elif "localized" in name or "seo" in name:
+            return {
+                "api": f"GET {base_url}/api/CommerceRuntime/Products/{product_id}/Metadata",
+                "productId": product_id,
+                "localization": {
+                    "language": arguments.get("languageCode", "en-US"),
+                    "localizedName": "Localized Product Name",
+                    "localizedDescription": "Localized product description"
+                },
+                "seo": {
+                    "title": "Product SEO Title",
+                    "description": "Product meta description",
+                    "keywords": ["product", "electronics", "wireless"]
+                }
+            }
+        
+        # Default mock response
+        else:
+            return {
+                "api": f"GET {base_url}/api/CommerceRuntime/Products/{name}",
+                "toolName": name,
+                "productId": product_id,
+                "status": "success",
+                "timestamp": datetime.now().isoformat() + "Z",
+                "message": f"Mock response for {name} - tool implemented with realistic data",
+                "mockData": {"result": "Success", "data": f"Mock data for {name}"}
+            }

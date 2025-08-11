@@ -1,7 +1,11 @@
 {
   "permissions": {
     "allow": [
-      "WebFetch(domain:learn.microsoft.com)"
+      "WebFetch(domain:learn.microsoft.com)",
+      "Bash(python test_mcp_server.py:*)",
+      "Bash(set DYNAMICS365_BASE_URL=https://contoso.commerce.dynamics.com)",
+      "Bash(python test:*)",
+      "Bash(python:*)"
     ],
     "deny": []
   }

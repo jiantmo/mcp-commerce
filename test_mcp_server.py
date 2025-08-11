@@ -11,10 +11,10 @@ def test_server_initialization():
     """Test if the server can be initialized"""
     try:
         server = Dynamics365CommerceServer()
-        print("✓ Server initialization: SUCCESS")
+        print("Server initialization: SUCCESS")
         return True
     except Exception as e:
-        print(f"✗ Server initialization: FAILED - {e}")
+        print(f"Server initialization: FAILED - {e}")
         return False
 
 def test_controllers():
@@ -28,10 +28,10 @@ def test_controllers():
         cart_tools = server.cart_controller.get_tools()
         sales_order_tools = server.sales_order_controller.get_tools()
         
-        print(f"✓ Customer controller: {len(customer_tools)} tools")
-        print(f"✓ Products controller: {len(products_tools)} tools")
-        print(f"✓ Cart controller: {len(cart_tools)} tools") 
-        print(f"✓ Sales Order controller: {len(sales_order_tools)} tools")
+        print(f"Customer controller: {len(customer_tools)} tools")
+        print(f"Products controller: {len(products_tools)} tools")
+        print(f"Cart controller: {len(cart_tools)} tools") 
+        print(f"Sales Order controller: {len(sales_order_tools)} tools")
         
         # Count total tools across all controllers
         all_tools = []
@@ -102,10 +102,10 @@ def test_controllers():
         all_tools.extend(server.scan_result_controller.get_tools())
         all_tools.extend(server.stock_count_journal_controller.get_tools())
         
-        print(f"✓ Total MCP tools available: {len(all_tools)}")
+        print(f"Total MCP tools available: {len(all_tools)}")
         return True
     except Exception as e:
-        print(f"✗ Controllers test: FAILED - {e}")
+        print(f"Controllers test: FAILED - {e}")
         return False
 
 async def test_async_functionality():
@@ -119,15 +119,15 @@ async def test_async_functionality():
             {"query": "test", "store_id": "test"}
         )
         
-        print("✓ Async tool call: SUCCESS")
+        print("Async tool call: SUCCESS")
         return True
     except Exception as e:
-        print(f"✗ Async tool call: FAILED - {e}")
+        print(f"Async tool call: FAILED - {e}")
         return False
 
 def main():
     """Main validation function"""
-    print("🔍 Validating MCP Dynamics 365 Commerce Server...")
+    print("Validating MCP Dynamics 365 Commerce Server...")
     print("=" * 50)
     
     success = True
@@ -146,14 +146,14 @@ def main():
     
     print("=" * 50)
     if success:
-        print("🎉 ALL TESTS PASSED - MCP server is ready for registration!")
+        print("ALL TESTS PASSED - MCP server is ready for registration!")
         print("\nNext steps:")
         print("1. Reload VS Code window")
         print("2. Open GitHub Copilot Chat")  
         print("3. Look for 'MCP Server: d365-commerce' in Add More Tools...")
         return 0
     else:
-        print("❌ SOME TESTS FAILED - Fix issues before registration")
+        print("SOME TESTS FAILED - Fix issues before registration")
         return 1
 
 if __name__ == "__main__":

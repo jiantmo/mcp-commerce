@@ -1,8 +1,9 @@
 """
 Address Controller for Dynamics 365 Commerce MCP Server
 
-Available MCP Tools (1 total):
+Available MCP Tools (2 total):
 1. address_get_address_purposes - Gets the address purposes
+2. address_validate_address - Validates address format and existence
 
 This controller handles address-related operations including address purpose management
 and address validation functionality.
@@ -60,6 +61,29 @@ class AddressController:
                         }
                     },
                     "required": []
+                }
+            ),
+            Tool(
+                name="address_validate_address",
+                description="Validates address format and existence",
+                inputSchema={
+                    "type": "object",
+                    "properties": {
+                        "address": {
+                            "type": "object",
+                            "description": "Address to validate",
+                            "properties": {
+                                "street": {"type": "string"},
+                                "city": {"type": "string"},
+                                "state": {"type": "string"},
+                                "zipCode": {"type": "string"},
+                                "country": {"type": "string"}
+                            },
+                            "required": ["street", "city", "state", "zipCode", "country"]
+                        },
+                        "baseUrl": {"type": "string", "default": "https://your-commerce-site.com"}
+                    },
+                    "required": ["address"]
                 }
             )
         ]
@@ -211,6 +235,39 @@ class AddressController:
                     "supportedRoles": ["Employee", "Customer", "Anonymous", "Application"],
                     "returnType": "PageResult<AddressPurpose>",
                     "description": "Gets the address purposes with paging and sorting support"
+                },
+                "timestamp": datetime.now().isoformat() + "Z",
+                "status": "success"
+            }
+        
+        elif name == "address_validate_address":
+            address = arguments.get("address", {})
+            
+            # Mock validation logic
+            is_valid = all([
+                address.get("street"),
+                address.get("city"), 
+                address.get("state"),
+                address.get("zipCode"),
+                address.get("country")
+            ])
+            
+            return {
+                "api": f"POST {base_url}/api/CommerceRuntime/Addresses/ValidateAddress",
+                "address": address,
+                "validation": {
+                    "isValid": is_valid,
+                    "confidence": random.uniform(0.85, 1.0) if is_valid else random.uniform(0.0, 0.5),
+                    "standardizedAddress": {
+                        "street": address.get("street", "").title(),
+                        "city": address.get("city", "").title(),
+                        "state": address.get("state", "").upper(),
+                        "zipCode": address.get("zipCode", ""),
+                        "country": address.get("country", "").upper()
+                    },
+                    "suggestions": [] if is_valid else ["Check street number", "Verify city spelling"],
+                    "deliverable": is_valid,
+                    "residential": random.choice([True, False])
                 },
                 "timestamp": datetime.now().isoformat() + "Z",
                 "status": "success"

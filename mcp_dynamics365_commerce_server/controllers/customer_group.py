@@ -1,8 +1,9 @@
 """
 Customer Group Controller for Dynamics 365 Commerce MCP Server
 
-Available MCP Tools (1 total):
+Available MCP Tools (2 total):
 1. customer_group_get_customer_groups - Gets collection of customer group
+2. customer_group_assign_customer - Assign customer to a group
 
 This controller handles customer group operations for customer categorization and targeting.
 """
@@ -59,6 +60,19 @@ class CustomerGroupController:
                         }
                     },
                     "required": []
+                }
+            ),
+            Tool(
+                name="customer_group_assign_customer",
+                description="Assign customer to a group",
+                inputSchema={
+                    "type": "object",
+                    "properties": {
+                        "customerId": {"type": "string"},
+                        "groupId": {"type": "string"},
+                        "baseUrl": {"type": "string", "default": "https://your-commerce-site.com"}
+                    },
+                    "required": ["customerId", "groupId"]
                 }
             )
         ]

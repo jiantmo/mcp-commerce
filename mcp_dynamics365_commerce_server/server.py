@@ -22,6 +22,9 @@ import requests
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+# Import configuration
+from .config import get_config
+
 # Import controller tools
 from .controllers.customer import CustomerController
 from .controllers.sales_order import SalesOrderController
@@ -94,6 +97,15 @@ from .controllers.stock_count_journal import StockCountJournalController
 class Dynamics365CommerceServer:
     def __init__(self):
         self.server = Server("mcp-dynamics365-commerce-server")
+        self.config = get_config()
+        
+        # Log configuration status
+        is_valid, message = self.config.validate_config()
+        if not is_valid:
+            logger.warning(f"Configuration warning: {message}")
+            logger.info("For configuration help, see CLAUDE.md or check the config module")
+        else:
+            logger.info(f"Configuration valid: Using base URL {self.config.base_url}")
         
         # Initialize controllers
         self.customer_controller = CustomerController()
@@ -409,6 +421,22 @@ async def main():
     """Main entry point for the MCP server"""
     server_instance = Dynamics365CommerceServer()
     
+    # Display configuration status on startup
+    config = server_instance.config
+    is_valid, message = config.validate_config()
+    
+    if not is_valid:
+        logger.warning("=" * 60)
+        logger.warning("CONFIGURATION WARNING")
+        logger.warning(message)
+        logger.warning("")
+        logger.warning("The server will start with a placeholder URL.")
+        logger.warning("Set DYNAMICS365_BASE_URL environment variable to your actual Commerce instance.")
+        logger.warning("Example: https://yourcompany.commerce.dynamics.com")
+        logger.warning("=" * 60)
+    else:
+        logger.info(f"Server configured with base URL: {config.base_url}")
+    
     # Set up the server handlers
     @server_instance.server.list_tools()
     async def list_tools() -> List[Tool]:
@@ -486,7 +514,17 @@ async def main():
     @server_instance.server.call_tool()
     async def call_tool(name: str, arguments: Dict[str, Any]) -> CallToolResult:
         """Handle tool calls"""
-        return await server_instance.handle_call_tool(name, arguments)
+        # Add configuration info to tool responses for debugging
+        result = await server_instance.handle_call_tool(name, arguments)
+        if isinstance(result.content[0], TextContent):
+            try:
+                response_data = json.loads(result.content[0].text)
+                if not server_instance.config.is_configured and "api" in response_data:
+                    response_data["_config_warning"] = "Using placeholder base URL. Set DYNAMICS365_BASE_URL environment variable."
+                result.content[0].text = json.dumps(response_data, indent=2, default=str)
+            except (json.JSONDecodeError, KeyError, AttributeError):
+                pass  # Don't modify if we can't parse the response
+        return result
     
     # Run the server
     async with stdio_server() as (read_stream, write_stream):
