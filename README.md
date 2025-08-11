@@ -16,13 +16,13 @@ This MCP server provides **125+ tools** organized into **19+ controllers**, cove
 - `customer_get_by_account_numbers` - Get customers list from account numbers
 - `customer_get_customer_search_fields` - Get customer search fields for the store
 - `customer_search_by_fields` - Search for customers by specified fields
-- `customer_post_nontransactional_activity_loyalty_points` - Post non-transactional loyalty points
+- `customer_post_loyalty_points` - Post non-transactional loyalty points
 
 ### 📦 Sales Order Controller (24 tools)
 - `salesorder_get_receipts` - Get receipts for a sales order based on form types for printing
 - `salesorder_get_gift_receipts` - Get gift receipts for specific sales line numbers
 - `salesorder_get_by_receipt_id` - Get sales orders by receipt identifier
-- `salesorder_search_sales_transactions_by_receipt_id` - Search sales transactions by receipt ID
+- `salesorder_search_transactions_by_receipt` - Search sales transactions by receipt ID
 - `salesorder_search` - Search for orders matching given search criteria
 - `salesorder_search_orders` - Search for orders matching order search criteria
 - `salesorder_get_invoices_by_sales_id` - Get sales invoices by sales identifier
@@ -33,16 +33,16 @@ This MCP server provides **125+ tools** organized into **19+ controllers**, cove
 - `salesorder_create_picking_list_for_items` - Create picking list for selected sales order lines
 - `salesorder_get_picking_lists` - Get picking lists for an order from headquarters
 - `salesorder_create_packing_slip` - Create a packing slip
-- `salesorder_get_sales_order_details_by_transaction_id` - Get sales order details by transaction ID
+- `salesorder_get_details_by_transaction_id` - Get sales order details by transaction ID
 - `salesorder_get_sales_order_details_by_sales_id` - Get sales order details by sales ID
-- `salesorder_get_sales_order_details_by_quotation_id` - Get sales order details by quotation ID
+- `salesorder_get_details_by_quotation_id` - Get sales order details by quotation ID
 - `salesorder_get_entity_by_key` - Get sales order by transaction identifier
 - `salesorder_create_entity` - Upload a booked sales order with tender lines
 - `salesorder_checkin_for_order_pickup` - Check in for order pickup
 - `salesorder_get_invoice_details` - Get invoice details by search criteria
 - `salesorder_send_receipt` - Send transaction receipt to electronic addresses
-- `salesorder_get_order_by_channel_reference_lookup_criteria` - Get sales order by channel reference ID
-- `salesorder_search_sales_transactions_by_receipt_id_paged` - Search sales transactions by receipt ID with paging
+- `salesorder_get_order_by_channel_ref` - Get sales order by channel reference ID
+- `salesorder_search_transactions_by_receipt_paged` - Search sales transactions by receipt ID with paging
 
 ### 🛒 Cart Controller (55 tools)
 - `cart_checkout` - Checkout the cart with payment processing
@@ -90,7 +90,7 @@ This MCP server provides **125+ tools** organized into **19+ controllers**, cove
 - `cart_add_coupons` - Add coupons to cart
 - `cart_remove_coupons` - Remove coupons from cart
 - `cart_get_charge_codes` - Get charge codes
-- `cart_get_max_loyalty_points_to_redeem_for_transaction_balance` - Get max loyalty points for redemption
+- `cart_get_max_loyalty_points_for_balance` - Get max loyalty points for redemption
 - `cart_get_declined_or_voided_card_receipts` - Get declined/voided card receipts
 - `cart_reset_all_charges` - Reset all charges
 - `cart_get_entity_by_key` - Get cart entity by key

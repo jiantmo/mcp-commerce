@@ -157,7 +157,7 @@ class LanguageController:
                 {
                     "languageId": "ja-JP",
                     "languageName": "Japanese (Japan)",
-                    "nativeName": "日本語 (日本)",
+                    "nativeName": "Japanese (Japan)",
                     "cultureCode": "ja-JP",
                     "countryRegion": "JP",
                     "countryRegionName": "Japan",
@@ -177,7 +177,7 @@ class LanguageController:
                 {
                     "languageId": "zh-CN",
                     "languageName": "Chinese (Simplified, China)",
-                    "nativeName": "中文(简体，中国)",
+                    "nativeName": "Chinese (Simplified, China)",
                     "cultureCode": "zh-CN",
                     "countryRegion": "CN",
                     "countryRegionName": "China",
