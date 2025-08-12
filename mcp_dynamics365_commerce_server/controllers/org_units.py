@@ -14,6 +14,7 @@ from typing import Any, Dict, List
 from datetime import datetime
 import random
 from mcp.types import Tool
+from ..config import get_base_url
 
 class OrgUnitsController:
     """Controller for Organizational Units-related Dynamics 365 Commerce API operations"""
@@ -62,7 +63,7 @@ class OrgUnitsController:
                         "baseUrl": {
                             "type": "string",
                             "description": "Base URL of the Dynamics 365 Commerce site",
-                            "default": "https://your-commerce-site.com"
+                            "default": "https://sculxdon4av67499847-rs.su.retail.test.dynamics.com"
                         }
                     },
                     "required": []
@@ -103,7 +104,7 @@ class OrgUnitsController:
                         "baseUrl": {
                             "type": "string",
                             "description": "Base URL of the Dynamics 365 Commerce site",
-                            "default": "https://your-commerce-site.com"
+                            "default": "https://sculxdon4av67499847-rs.su.retail.test.dynamics.com"
                         }
                     },
                     "required": ["orgUnitId"]
@@ -131,7 +132,7 @@ class OrgUnitsController:
                         "baseUrl": {
                             "type": "string",
                             "description": "Base URL of the Dynamics 365 Commerce site",
-                            "default": "https://your-commerce-site.com"
+                            "default": "https://sculxdon4av67499847-rs.su.retail.test.dynamics.com"
                         }
                     },
                     "required": ["orgUnitId"]
@@ -141,7 +142,7 @@ class OrgUnitsController:
     
     async def handle_tool(self, name: str, arguments: Dict[str, Any]) -> Dict[str, Any]:
         """Handle org units tool calls with mock implementations"""
-        base_url = arguments.get("baseUrl", "https://your-commerce-site.com")
+        base_url = arguments.get("baseUrl", get_base_url())
         
         if name == "orgunits_get_locations_by_area":
             area = arguments.get("area", "Seattle")

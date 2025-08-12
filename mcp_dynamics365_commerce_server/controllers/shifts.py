@@ -32,6 +32,7 @@ from datetime import datetime, timedelta
 import random
 import string
 from mcp.types import Tool
+from ..config import get_base_url
 
 class ShiftsController:
     """Controller for Shifts-related Dynamics 365 Commerce API operations"""
@@ -47,7 +48,7 @@ class ShiftsController:
                     "properties": {
                         "shiftId": {"type": "string", "description": "The shift ID to retrieve"},
                         "terminalId": {"type": "string", "description": "Terminal ID"},
-                        "baseUrl": {"type": "string", "default": "https://your-commerce-site.com"}
+                        "baseUrl": {"type": "string", "default": "https://sculxdon4av67499847-rs.su.retail.test.dynamics.com"}
                     },
                     "required": ["shiftId", "terminalId"]
                 }
@@ -59,7 +60,7 @@ class ShiftsController:
                     "type": "object",
                     "properties": {
                         "statusValue": {"type": "number", "description": "Status value"},
-                        "baseUrl": {"type": "string", "default": "https://your-commerce-site.com"}
+                        "baseUrl": {"type": "string", "default": "https://sculxdon4av67499847-rs.su.retail.test.dynamics.com"}
                     },
                     "required": ["statusValue"]
                 }
@@ -72,7 +73,7 @@ class ShiftsController:
                     "properties": {
                         "statusValue": {"type": "number", "description": "Status value"},
                         "filterByUserRole": {"type": "boolean", "description": "Filter by user role"},
-                        "baseUrl": {"type": "string", "default": "https://your-commerce-site.com"}
+                        "baseUrl": {"type": "string", "default": "https://sculxdon4av67499847-rs.su.retail.test.dynamics.com"}
                     },
                     "required": ["statusValue", "filterByUserRole"]
                 }
@@ -84,7 +85,7 @@ class ShiftsController:
                     "type": "object",
                     "properties": {
                         "shiftRetrievalCriteria": {"type": "object", "description": "Shift retrieval criteria"},
-                        "baseUrl": {"type": "string", "default": "https://your-commerce-site.com"}
+                        "baseUrl": {"type": "string", "default": "https://sculxdon4av67499847-rs.su.retail.test.dynamics.com"}
                     },
                     "required": ["shiftRetrievalCriteria"]
                 }
@@ -98,7 +99,7 @@ class ShiftsController:
                         "shiftId": {"type": "number", "description": "Shift ID"},
                         "terminalId": {"type": "string", "description": "Terminal ID"},
                         "shifts": {"type": "array", "description": "Collection of shifts"},
-                        "baseUrl": {"type": "string", "default": "https://your-commerce-site.com"}
+                        "baseUrl": {"type": "string", "default": "https://sculxdon4av67499847-rs.su.retail.test.dynamics.com"}
                     },
                     "required": ["terminalId", "shifts"]
                 }
@@ -109,7 +110,7 @@ class ShiftsController:
                 inputSchema={
                     "type": "object",
                     "properties": {
-                        "baseUrl": {"type": "string", "default": "https://your-commerce-site.com"}
+                        "baseUrl": {"type": "string", "default": "https://sculxdon4av67499847-rs.su.retail.test.dynamics.com"}
                     }
                 }
             ),
@@ -119,7 +120,7 @@ class ShiftsController:
                 inputSchema={
                     "type": "object",
                     "properties": {
-                        "baseUrl": {"type": "string", "default": "https://your-commerce-site.com"}
+                        "baseUrl": {"type": "string", "default": "https://sculxdon4av67499847-rs.su.retail.test.dynamics.com"}
                     }
                 }
             ),
@@ -133,7 +134,7 @@ class ShiftsController:
                         "terminalId": {"type": "string", "description": "Terminal ID"},
                         "transactionId": {"type": "string", "description": "Transaction ID"},
                         "forceClose": {"type": "boolean", "description": "Force close flag"},
-                        "baseUrl": {"type": "string", "default": "https://your-commerce-site.com"}
+                        "baseUrl": {"type": "string", "default": "https://sculxdon4av67499847-rs.su.retail.test.dynamics.com"}
                     },
                     "required": ["shiftId", "terminalId", "transactionId", "forceClose"]
                 }
@@ -148,7 +149,7 @@ class ShiftsController:
                         "terminalId": {"type": "string", "description": "Terminal ID"},
                         "transactionId": {"type": "string", "description": "Transaction ID"},
                         "forceClose": {"type": "boolean", "description": "Force close flag"},
-                        "baseUrl": {"type": "string", "default": "https://your-commerce-site.com"}
+                        "baseUrl": {"type": "string", "default": "https://sculxdon4av67499847-rs.su.retail.test.dynamics.com"}
                     },
                     "required": ["shiftId", "terminalId", "transactionId", "forceClose"]
                 }
@@ -162,7 +163,7 @@ class ShiftsController:
                         "shiftId": {"type": "number", "description": "Shift ID"},
                         "terminalId": {"type": "string", "description": "Terminal ID"},
                         "transactionId": {"type": "string", "description": "Transaction ID"},
-                        "baseUrl": {"type": "string", "default": "https://your-commerce-site.com"}
+                        "baseUrl": {"type": "string", "default": "https://sculxdon4av67499847-rs.su.retail.test.dynamics.com"}
                     },
                     "required": ["shiftId", "terminalId", "transactionId"]
                 }
@@ -176,7 +177,7 @@ class ShiftsController:
                         "shiftId": {"type": "number", "description": "Shift ID"},
                         "terminalId": {"type": "string", "description": "Terminal ID"},
                         "cashDrawer": {"type": "string", "description": "Cash drawer"},
-                        "baseUrl": {"type": "string", "default": "https://your-commerce-site.com"}
+                        "baseUrl": {"type": "string", "default": "https://sculxdon4av67499847-rs.su.retail.test.dynamics.com"}
                     },
                     "required": ["shiftId", "terminalId", "cashDrawer"]
                 }
@@ -189,7 +190,7 @@ class ShiftsController:
                     "properties": {
                         "shiftId": {"type": "number", "description": "Shift ID"},
                         "terminalId": {"type": "string", "description": "Terminal ID"},
-                        "baseUrl": {"type": "string", "default": "https://your-commerce-site.com"}
+                        "baseUrl": {"type": "string", "default": "https://sculxdon4av67499847-rs.su.retail.test.dynamics.com"}
                     },
                     "required": ["shiftId", "terminalId"]
                 }
@@ -203,7 +204,7 @@ class ShiftsController:
                         "shiftId": {"type": "number", "description": "Shift ID"},
                         "terminalId": {"type": "string", "description": "Terminal ID"},
                         "transactionId": {"type": "string", "description": "Transaction ID"},
-                        "baseUrl": {"type": "string", "default": "https://your-commerce-site.com"}
+                        "baseUrl": {"type": "string", "default": "https://sculxdon4av67499847-rs.su.retail.test.dynamics.com"}
                     },
                     "required": ["shiftId", "terminalId", "transactionId"]
                 }
@@ -215,7 +216,7 @@ class ShiftsController:
                     "type": "object",
                     "properties": {
                         "shift": {"type": "object", "description": "Shift object"},
-                        "baseUrl": {"type": "string", "default": "https://your-commerce-site.com"}
+                        "baseUrl": {"type": "string", "default": "https://sculxdon4av67499847-rs.su.retail.test.dynamics.com"}
                     },
                     "required": ["shift"]
                 }
@@ -229,7 +230,7 @@ class ShiftsController:
                         "shiftId": {"type": "number", "description": "Shift ID"},
                         "terminalId": {"type": "string", "description": "Terminal ID"},
                         "delta": {"type": "object", "description": "Delta changes"},
-                        "baseUrl": {"type": "string", "default": "https://your-commerce-site.com"}
+                        "baseUrl": {"type": "string", "default": "https://sculxdon4av67499847-rs.su.retail.test.dynamics.com"}
                     },
                     "required": ["shiftId", "terminalId", "delta"]
                 }
@@ -244,7 +245,7 @@ class ShiftsController:
                         "terminalId": {"type": "string", "description": "Terminal ID"},
                         "transactionId": {"type": "string", "description": "Transaction ID"},
                         "hardwareProfileId": {"type": "string", "description": "Hardware profile ID"},
-                        "baseUrl": {"type": "string", "default": "https://your-commerce-site.com"}
+                        "baseUrl": {"type": "string", "default": "https://sculxdon4av67499847-rs.su.retail.test.dynamics.com"}
                     },
                     "required": ["shiftId", "terminalId", "transactionId", "hardwareProfileId"]
                 }
@@ -257,7 +258,7 @@ class ShiftsController:
                     "properties": {
                         "transactionId": {"type": "string", "description": "Transaction ID"},
                         "hardwareProfileId": {"type": "string", "description": "Hardware profile ID"},
-                        "baseUrl": {"type": "string", "default": "https://your-commerce-site.com"}
+                        "baseUrl": {"type": "string", "default": "https://sculxdon4av67499847-rs.su.retail.test.dynamics.com"}
                     },
                     "required": ["transactionId", "hardwareProfileId"]
                 }
@@ -270,7 +271,7 @@ class ShiftsController:
                     "properties": {
                         "shiftTerminalId": {"type": "string", "description": "Shift terminal ID"},
                         "shiftId": {"type": "number", "description": "Shift ID"},
-                        "baseUrl": {"type": "string", "default": "https://your-commerce-site.com"}
+                        "baseUrl": {"type": "string", "default": "https://sculxdon4av67499847-rs.su.retail.test.dynamics.com"}
                     },
                     "required": ["shiftTerminalId", "shiftId"]
                 }
@@ -283,7 +284,7 @@ class ShiftsController:
                     "properties": {
                         "shiftTerminalId": {"type": "string", "description": "Shift terminal ID"},
                         "shiftId": {"type": "number", "description": "Shift ID"},
-                        "baseUrl": {"type": "string", "default": "https://your-commerce-site.com"}
+                        "baseUrl": {"type": "string", "default": "https://sculxdon4av67499847-rs.su.retail.test.dynamics.com"}
                     },
                     "required": ["shiftTerminalId", "shiftId"]
                 }
@@ -296,7 +297,7 @@ class ShiftsController:
                     "properties": {
                         "shiftId": {"type": "number", "description": "Shift ID"},
                         "shiftTerminalId": {"type": "string", "description": "Shift terminal ID"},
-                        "baseUrl": {"type": "string", "default": "https://your-commerce-site.com"}
+                        "baseUrl": {"type": "string", "default": "https://sculxdon4av67499847-rs.su.retail.test.dynamics.com"}
                     },
                     "required": ["shiftId", "shiftTerminalId"]
                 }
@@ -305,7 +306,7 @@ class ShiftsController:
     
     async def handle_tool(self, name: str, arguments: Dict[str, Any]) -> Dict[str, Any]:
         """Handle shifts tool calls with mock implementations"""
-        base_url = arguments.get("baseUrl", "https://your-commerce-site.com")
+        base_url = arguments.get("baseUrl", get_base_url())
         
         if name == "shifts_get_shift":
             shift_id = arguments.get("shiftId", "1")

@@ -23,6 +23,7 @@ from datetime import datetime, timedelta
 import random
 import string
 from mcp.types import Tool
+from ..config import get_base_url
 
 class LoyaltyCardController:
     """Controller for Loyalty Card-related Dynamics 365 Commerce API operations"""
@@ -58,7 +59,7 @@ class LoyaltyCardController:
                         "baseUrl": {
                             "type": "string",
                             "description": "Base URL of the Dynamics 365 Commerce site",
-                            "default": "https://your-commerce-site.com"
+                            "default": "https://sculxdon4av67499847-rs.su.retail.test.dynamics.com"
                         }
                     },
                     "required": ["customerId"]
@@ -90,7 +91,7 @@ class LoyaltyCardController:
                         "baseUrl": {
                             "type": "string",
                             "description": "Base URL of the Dynamics 365 Commerce site",
-                            "default": "https://your-commerce-site.com"
+                            "default": "https://sculxdon4av67499847-rs.su.retail.test.dynamics.com"
                         }
                     },
                     "required": []
@@ -132,7 +133,7 @@ class LoyaltyCardController:
                         "baseUrl": {
                             "type": "string",
                             "description": "Base URL of the Dynamics 365 Commerce site",
-                            "default": "https://your-commerce-site.com"
+                            "default": "https://sculxdon4av67499847-rs.su.retail.test.dynamics.com"
                         }
                     },
                     "required": []
@@ -146,7 +147,7 @@ class LoyaltyCardController:
                     "properties": {
                         "cardId": {"type": "string", "description": "Loyalty card ID"},
                         "cardNumber": {"type": "string", "description": "Loyalty card number"},
-                        "baseUrl": {"type": "string", "default": "https://your-commerce-site.com"}
+                        "baseUrl": {"type": "string", "default": "https://sculxdon4av67499847-rs.su.retail.test.dynamics.com"}
                     },
                     "required": []
                 }
@@ -161,7 +162,7 @@ class LoyaltyCardController:
                         "points": {"type": "number", "description": "Points to earn"},
                         "transactionId": {"type": "string", "description": "Transaction ID"},
                         "reason": {"type": "string", "description": "Reason for earning points"},
-                        "baseUrl": {"type": "string", "default": "https://your-commerce-site.com"}
+                        "baseUrl": {"type": "string", "default": "https://sculxdon4av67499847-rs.su.retail.test.dynamics.com"}
                     },
                     "required": ["cardId", "points"]
                 }
@@ -175,7 +176,7 @@ class LoyaltyCardController:
                         "cardId": {"type": "string", "description": "Loyalty card ID"},
                         "points": {"type": "number", "description": "Points to redeem"},
                         "redemptionType": {"type": "string", "description": "Type of redemption"},
-                        "baseUrl": {"type": "string", "default": "https://your-commerce-site.com"}
+                        "baseUrl": {"type": "string", "default": "https://sculxdon4av67499847-rs.su.retail.test.dynamics.com"}
                     },
                     "required": ["cardId", "points"]
                 }
@@ -190,7 +191,7 @@ class LoyaltyCardController:
                         "toCardId": {"type": "string", "description": "Destination card ID"},
                         "points": {"type": "number", "description": "Points to transfer"},
                         "reason": {"type": "string", "description": "Transfer reason"},
-                        "baseUrl": {"type": "string", "default": "https://your-commerce-site.com"}
+                        "baseUrl": {"type": "string", "default": "https://sculxdon4av67499847-rs.su.retail.test.dynamics.com"}
                     },
                     "required": ["fromCardId", "toCardId", "points"]
                 }
@@ -202,7 +203,7 @@ class LoyaltyCardController:
                     "type": "object",
                     "properties": {
                         "includeInactive": {"type": "boolean", "default": False},
-                        "baseUrl": {"type": "string", "default": "https://your-commerce-site.com"}
+                        "baseUrl": {"type": "string", "default": "https://sculxdon4av67499847-rs.su.retail.test.dynamics.com"}
                     }
                 }
             ),
@@ -214,7 +215,7 @@ class LoyaltyCardController:
                     "properties": {
                         "cardId": {"type": "string", "description": "Loyalty card ID"},
                         "updateData": {"type": "object", "description": "Update data"},
-                        "baseUrl": {"type": "string", "default": "https://your-commerce-site.com"}
+                        "baseUrl": {"type": "string", "default": "https://sculxdon4av67499847-rs.su.retail.test.dynamics.com"}
                     },
                     "required": ["cardId", "updateData"]
                 }
@@ -228,7 +229,7 @@ class LoyaltyCardController:
                         "cardId": {"type": "string", "description": "Loyalty card ID"},
                         "isBlocked": {"type": "boolean", "description": "Block status"},
                         "reason": {"type": "string", "description": "Block/unblock reason"},
-                        "baseUrl": {"type": "string", "default": "https://your-commerce-site.com"}
+                        "baseUrl": {"type": "string", "default": "https://sculxdon4av67499847-rs.su.retail.test.dynamics.com"}
                     },
                     "required": ["cardId", "isBlocked"]
                 }
@@ -237,7 +238,7 @@ class LoyaltyCardController:
     
     async def handle_tool(self, name: str, arguments: Dict[str, Any]) -> Dict[str, Any]:
         """Handle loyalty card tool calls with mock implementations"""
-        base_url = arguments.get("baseUrl", "https://your-commerce-site.com")
+        base_url = arguments.get("baseUrl", get_base_url())
         
         if name == "loyaltycard_issue_loyalty_card":
             customer_id = arguments.get("customerId", "CUST001")

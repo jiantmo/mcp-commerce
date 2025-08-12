@@ -12,6 +12,7 @@ from typing import Any, Dict, List
 from datetime import datetime
 import random
 from mcp.types import Tool
+from ..config import get_base_url
 
 class CustomerGroupController:
     """Controller for Customer Group-related Dynamics 365 Commerce API operations"""
@@ -56,7 +57,7 @@ class CustomerGroupController:
                         "baseUrl": {
                             "type": "string",
                             "description": "Base URL of the Dynamics 365 Commerce site",
-                            "default": "https://your-commerce-site.com"
+                            "default": "https://sculxdon4av67499847-rs.su.retail.test.dynamics.com"
                         }
                     },
                     "required": []
@@ -70,7 +71,7 @@ class CustomerGroupController:
                     "properties": {
                         "customerId": {"type": "string"},
                         "groupId": {"type": "string"},
-                        "baseUrl": {"type": "string", "default": "https://your-commerce-site.com"}
+                        "baseUrl": {"type": "string", "default": "https://sculxdon4av67499847-rs.su.retail.test.dynamics.com"}
                     },
                     "required": ["customerId", "groupId"]
                 }
@@ -79,7 +80,7 @@ class CustomerGroupController:
     
     async def handle_tool(self, name: str, arguments: Dict[str, Any]) -> Dict[str, Any]:
         """Handle customer group tool calls with mock implementations"""
-        base_url = arguments.get("baseUrl", "https://your-commerce-site.com")
+        base_url = arguments.get("baseUrl", get_base_url())
         
         if name == "customer_group_get_customer_groups":
             query_settings = arguments.get("queryResultSettings", {})

@@ -36,6 +36,7 @@ from datetime import datetime, timedelta
 import random
 import string
 from mcp.types import Tool
+from ..config import get_base_url
 
 class SalesOrderController:
     """Controller for Sales Order-related Dynamics 365 Commerce API operations"""
@@ -60,7 +61,7 @@ class SalesOrderController:
                                 "isRemoteTransaction": {"type": "boolean"}
                             }
                         },
-                        "baseUrl": {"type": "string", "default": "https://your-commerce-site.com"}
+                        "baseUrl": {"type": "string", "default": "https://sculxdon4av67499847-rs.su.retail.test.dynamics.com"}
                     },
                     "required": ["salesId"]
                 }
@@ -75,7 +76,7 @@ class SalesOrderController:
                         "salesId": {"type": "string", "description": "Sales order ID"},
                         "salesLineNumbers": {"type": "array", "items": {"type": "number"}, "description": "Sales line numbers"},
                         "receiptRetrievalCriteria": {"type": "object", "description": "Receipt retrieval criteria"},
-                        "baseUrl": {"type": "string", "default": "https://your-commerce-site.com"}
+                        "baseUrl": {"type": "string", "default": "https://sculxdon4av67499847-rs.su.retail.test.dynamics.com"}
                     },
                     "required": ["salesId", "salesLineNumbers"]
                 }
@@ -90,7 +91,7 @@ class SalesOrderController:
                         "receiptId": {"type": "string", "description": "Receipt identifier"},
                         "orderStoreNumber": {"type": "string", "description": "Order store number"},
                         "orderTerminalId": {"type": "string", "description": "Order terminal ID"},
-                        "baseUrl": {"type": "string", "default": "https://your-commerce-site.com"}
+                        "baseUrl": {"type": "string", "default": "https://sculxdon4av67499847-rs.su.retail.test.dynamics.com"}
                     },
                     "required": ["receiptId"]
                 }
@@ -103,7 +104,7 @@ class SalesOrderController:
                     "type": "object",
                     "properties": {
                         "receiptId": {"type": "string", "description": "Receipt identifier"},
-                        "baseUrl": {"type": "string", "default": "https://your-commerce-site.com"}
+                        "baseUrl": {"type": "string", "default": "https://sculxdon4av67499847-rs.su.retail.test.dynamics.com"}
                     },
                     "required": ["receiptId"]
                 }
@@ -125,7 +126,7 @@ class SalesOrderController:
                                 "channelReferenceId": {"type": "string"}
                             }
                         },
-                        "baseUrl": {"type": "string", "default": "https://your-commerce-site.com"}
+                        "baseUrl": {"type": "string", "default": "https://sculxdon4av67499847-rs.su.retail.test.dynamics.com"}
                     },
                     "required": ["salesOrderSearchCriteria"]
                 }
@@ -148,7 +149,7 @@ class SalesOrderController:
                                 "endDateTime": {"type": "string"}
                             }
                         },
-                        "baseUrl": {"type": "string", "default": "https://your-commerce-site.com"}
+                        "baseUrl": {"type": "string", "default": "https://sculxdon4av67499847-rs.su.retail.test.dynamics.com"}
                     },
                     "required": ["orderSearchCriteria"]
                 }
@@ -161,7 +162,7 @@ class SalesOrderController:
                     "type": "object",
                     "properties": {
                         "salesId": {"type": "string", "description": "Sales identifier"},
-                        "baseUrl": {"type": "string", "default": "https://your-commerce-site.com"}
+                        "baseUrl": {"type": "string", "default": "https://sculxdon4av67499847-rs.su.retail.test.dynamics.com"}
                     },
                     "required": ["salesId"]
                 }
@@ -174,7 +175,7 @@ class SalesOrderController:
                     "type": "object",
                     "properties": {
                         "customerAccount": {"type": "string", "description": "Customer account"},
-                        "baseUrl": {"type": "string", "default": "https://your-commerce-site.com"}
+                        "baseUrl": {"type": "string", "default": "https://sculxdon4av67499847-rs.su.retail.test.dynamics.com"}
                     },
                     "required": ["customerAccount"]
                 }
@@ -195,7 +196,7 @@ class SalesOrderController:
                                 "salesId": {"type": "string"}
                             }
                         },
-                        "baseUrl": {"type": "string", "default": "https://your-commerce-site.com"}
+                        "baseUrl": {"type": "string", "default": "https://sculxdon4av67499847-rs.su.retail.test.dynamics.com"}
                     },
                     "required": ["invoiceSearchCriteria"]
                 }
@@ -208,7 +209,7 @@ class SalesOrderController:
                     "type": "object",
                     "properties": {
                         "salesIds": {"type": "array", "items": {"type": "string"}, "description": "Sales order IDs"},
-                        "baseUrl": {"type": "string", "default": "https://your-commerce-site.com"}
+                        "baseUrl": {"type": "string", "default": "https://sculxdon4av67499847-rs.su.retail.test.dynamics.com"}
                     },
                     "required": ["salesIds"]
                 }
@@ -221,7 +222,7 @@ class SalesOrderController:
                     "type": "object",
                     "properties": {
                         "salesId": {"type": "string", "description": "Sales order ID"},
-                        "baseUrl": {"type": "string", "default": "https://your-commerce-site.com"}
+                        "baseUrl": {"type": "string", "default": "https://sculxdon4av67499847-rs.su.retail.test.dynamics.com"}
                     },
                     "required": ["salesId"]
                 }
@@ -244,7 +245,7 @@ class SalesOrderController:
                                 }
                             }
                         },
-                        "baseUrl": {"type": "string", "default": "https://your-commerce-site.com"}
+                        "baseUrl": {"type": "string", "default": "https://sculxdon4av67499847-rs.su.retail.test.dynamics.com"}
                     },
                     "required": ["salesId", "pickAndPackSalesLineParameters"]
                 }
@@ -257,7 +258,7 @@ class SalesOrderController:
                     "type": "object",
                     "properties": {
                         "salesId": {"type": "string", "description": "Sales order ID"},
-                        "baseUrl": {"type": "string", "default": "https://your-commerce-site.com"}
+                        "baseUrl": {"type": "string", "default": "https://sculxdon4av67499847-rs.su.retail.test.dynamics.com"}
                     },
                     "required": ["salesId"]
                 }
@@ -270,7 +271,7 @@ class SalesOrderController:
                     "type": "object",
                     "properties": {
                         "salesId": {"type": "string", "description": "Sales order ID"},
-                        "baseUrl": {"type": "string", "default": "https://your-commerce-site.com"}
+                        "baseUrl": {"type": "string", "default": "https://sculxdon4av67499847-rs.su.retail.test.dynamics.com"}
                     },
                     "required": ["salesId"]
                 }
@@ -284,7 +285,7 @@ class SalesOrderController:
                     "properties": {
                         "transactionId": {"type": "string", "description": "Transaction ID"},
                         "searchLocationValue": {"type": "number", "description": "Search location value"},
-                        "baseUrl": {"type": "string", "default": "https://your-commerce-site.com"}
+                        "baseUrl": {"type": "string", "default": "https://sculxdon4av67499847-rs.su.retail.test.dynamics.com"}
                     },
                     "required": ["transactionId"]
                 }
@@ -297,7 +298,7 @@ class SalesOrderController:
                     "type": "object",
                     "properties": {
                         "salesId": {"type": "string", "description": "Sales ID"},
-                        "baseUrl": {"type": "string", "default": "https://your-commerce-site.com"}
+                        "baseUrl": {"type": "string", "default": "https://sculxdon4av67499847-rs.su.retail.test.dynamics.com"}
                     },
                     "required": ["salesId"]
                 }
@@ -310,7 +311,7 @@ class SalesOrderController:
                     "type": "object",
                     "properties": {
                         "quotationId": {"type": "string", "description": "Quotation ID"},
-                        "baseUrl": {"type": "string", "default": "https://your-commerce-site.com"}
+                        "baseUrl": {"type": "string", "default": "https://sculxdon4av67499847-rs.su.retail.test.dynamics.com"}
                     },
                     "required": ["quotationId"]
                 }
@@ -323,7 +324,7 @@ class SalesOrderController:
                     "type": "object",
                     "properties": {
                         "transactionId": {"type": "string", "description": "Transaction identifier"},
-                        "baseUrl": {"type": "string", "default": "https://your-commerce-site.com"}
+                        "baseUrl": {"type": "string", "default": "https://sculxdon4av67499847-rs.su.retail.test.dynamics.com"}
                     },
                     "required": ["transactionId"]
                 }
@@ -344,7 +345,7 @@ class SalesOrderController:
                                 "tenderLines": {"type": "array"}
                             }
                         },
-                        "baseUrl": {"type": "string", "default": "https://your-commerce-site.com"}
+                        "baseUrl": {"type": "string", "default": "https://sculxdon4av67499847-rs.su.retail.test.dynamics.com"}
                     },
                     "required": ["salesOrder"]
                 }
@@ -360,7 +361,7 @@ class SalesOrderController:
                         "packingSlipId": {"type": "string", "description": "Packing slip ID"},
                         "channelReferenceId": {"type": "string", "description": "Channel reference ID"},
                         "extensionProperties": {"type": "array", "description": "Extension properties"},
-                        "baseUrl": {"type": "string", "default": "https://your-commerce-site.com"}
+                        "baseUrl": {"type": "string", "default": "https://sculxdon4av67499847-rs.su.retail.test.dynamics.com"}
                     },
                     "required": ["channelId", "packingSlipId", "channelReferenceId"]
                 }
@@ -381,7 +382,7 @@ class SalesOrderController:
                                 "customerAccount": {"type": "string"}
                             }
                         },
-                        "baseUrl": {"type": "string", "default": "https://your-commerce-site.com"}
+                        "baseUrl": {"type": "string", "default": "https://sculxdon4av67499847-rs.su.retail.test.dynamics.com"}
                     },
                     "required": ["invoiceDetailsSearchCriteria"]
                 }
@@ -413,7 +414,7 @@ class SalesOrderController:
                             "maxItems": 3,
                             "description": "Up to 3 recipient addresses"
                         },
-                        "baseUrl": {"type": "string", "default": "https://your-commerce-site.com"}
+                        "baseUrl": {"type": "string", "default": "https://sculxdon4av67499847-rs.su.retail.test.dynamics.com"}
                     },
                     "required": ["searchReceiptCriteria", "recipientAddresses"]
                 }
@@ -433,7 +434,7 @@ class SalesOrderController:
                                 "channelId": {"type": "number"}
                             }
                         },
-                        "baseUrl": {"type": "string", "default": "https://your-commerce-site.com"}
+                        "baseUrl": {"type": "string", "default": "https://sculxdon4av67499847-rs.su.retail.test.dynamics.com"}
                     },
                     "required": ["channelReferenceLookupCriteria"]
                 }
@@ -474,7 +475,7 @@ class SalesOrderController:
                                 }
                             }
                         },
-                        "baseUrl": {"type": "string", "default": "https://your-commerce-site.com"}
+                        "baseUrl": {"type": "string", "default": "https://sculxdon4av67499847-rs.su.retail.test.dynamics.com"}
                     },
                     "required": ["receiptId"]
                 }
@@ -483,7 +484,7 @@ class SalesOrderController:
     
     async def handle_tool(self, name: str, arguments: Dict[str, Any]) -> Dict[str, Any]:
         """Handle sales order tool calls with mock implementations"""
-        base_url = arguments.get("baseUrl", "https://your-commerce-site.com")
+        base_url = arguments.get("baseUrl", get_base_url())
         
         # Note: This is a comprehensive mock implementation
         # In a real implementation, you would call the actual Dynamics 365 Commerce APIs

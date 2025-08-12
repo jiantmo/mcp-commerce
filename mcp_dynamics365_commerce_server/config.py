@@ -33,8 +33,8 @@ class CommerceConfig:
             # Ensure URL doesn't end with slash
             return self._base_url.rstrip('/')
         
-        # Return a more realistic default that indicates configuration needed
-        return "https://your-commerce-instance.commerce.dynamics.com"
+        # Return your actual Dynamics 365 Commerce URL as default
+        return "https://sculxdon4av67499847-rs.su.retail.test.dynamics.com"
     
     @property
     def is_configured(self) -> bool:
@@ -42,7 +42,8 @@ class CommerceConfig:
         return (self._base_url is not None and 
                 not self._base_url.startswith('https://your-commerce') and
                 not self._base_url.startswith('https://example') and
-                'your-commerce-site.com' not in self._base_url)
+                'your-commerce-site.com' not in self._base_url) or \
+               self.base_url == "https://sculxdon4av67499847-rs.su.retail.test.dynamics.com"
     
     def get_api_endpoint(self, path: str) -> str:
         """Get full API endpoint URL"""

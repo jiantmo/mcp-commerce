@@ -11,6 +11,7 @@ from typing import Any, Dict, List
 from datetime import datetime, timedelta
 import random
 from mcp.types import Tool
+from ..config import get_base_url
 
 class CreditMemoController:
     """Controller for Credit Memo-related Dynamics 365 Commerce API operations"""
@@ -31,7 +32,7 @@ class CreditMemoController:
                         "baseUrl": {
                             "type": "string",
                             "description": "Base URL of the Dynamics 365 Commerce site",
-                            "default": "https://your-commerce-site.com"
+                            "default": "https://sculxdon4av67499847-rs.su.retail.test.dynamics.com"
                         }
                     },
                     "required": ["creditMemoId"]
@@ -41,7 +42,7 @@ class CreditMemoController:
     
     async def handle_tool(self, name: str, arguments: Dict[str, Any]) -> Dict[str, Any]:
         """Handle credit memo tool calls with mock implementations"""
-        base_url = arguments.get("baseUrl", "https://your-commerce-site.com")
+        base_url = arguments.get("baseUrl", get_base_url())
         
         if name == "credit_memo_get_credit_memo_by_id":
             credit_memo_id = arguments.get("creditMemoId", "CM001")
